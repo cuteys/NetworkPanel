@@ -1,292 +1,275 @@
 <template>
-  <div class="radius card" :style="{ borderRadius: 'var(--el-border-radius-round)' }">
-    <div style="margin-top: 10px;margin-left: 10px;margin-right: 10px;">
-      <div class="slider-demo-block">
-        <span class="font-background">测速地址：</span>
-        <el-button type="primary" :icon="CopyDocument" link @click="copyUrl" />
-        <el-button type="primary" :icon="Edit" link @click="EditTableVisible = true" />
-        <br>
-        <el-select style="width: 100%;" v-model="runUrl">
+  <div class="main-container">
+    <div class="ios-card glass">
+      <div class="card-header">
+        <span class="card-title">测速地址</span>
+        <div class="card-actions">
+          <button class="icon-btn" @click="copyUrl" title="复制链接">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+            </svg>
+          </button>
+          <button class="icon-btn" @click="EditTableVisible = true" title="编辑地址">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="ios-select-wrapper">
+        <el-select v-model="runUrl" class="ios-select-custom">
           <el-option-group v-for="group in nodes" :key="group.label" :label="group.label">
             <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value" />
           </el-option-group>
-          <template #prefix>
-            <el-icon>
-              <Link />
-            </el-icon>
-          </template>
         </el-select>
       </div>
-      <div style="margin-top:20px;">
-        <span class="font-background">线程数：{{ threadNum }}</span>
-        <el-slider :show-tooltip="false" :min="1" :max='64' v-model="threadNum" />
-      </div>
-      <div style="width: 100%;height:32px;">
-        <div style="float: left;">
-          <el-switch v-model="runBackground" active-text="保持后台运行" />
-        </div>
-        <div style="float: right;">
-          <el-switch v-model="autoStart" active-text="自动运行" />
-        </div>
-      </div>
-      <div class="ItemContainer">
-        <div class="showItem">
-          <span class="font-background" style="font-size: larger;">总流量</span>
-          <el-text size="small" class="mx-1">{{ state.maxUse ? '/' + formatter(state.maxUse, 0, [0, 0, 0, 0, 0, 0]) : ""
-          }}</el-text>
-          <el-button type="primary" style="height: 15px;" :icon="Edit" link @click="EditMaxVisible = true" />
-          <div class="state-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-              class="h-15 w-15 float-right pt-3">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
-            </svg>
-          </div>
-          <el-text class="font-data">{{ state.show.allUsed }}</el-text>
-        </div>
-        <div class="showItem">
-          <span class="font-background" style="font-size: larger;">{{ isRunning ? '实时速度' : '平均速度' }}</span>
-          <el-popover placement="top-start" title="用量预测" :width="150" trigger="click">
-            <template #reference>
-              <el-button type="primary" style="height: 15px;vertical-align: -2px;" :icon="Calendar" link />
-            </template>
-            每分钟&nbsp;&nbsp;{{ state.predict.min }}
-            <br>
-            每小时&nbsp;&nbsp;{{ state.predict.hour }}
-            <br>
-            每天&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ state.predict.day }}
-            <br>
-            每月&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ state.predict.mon }}
-          </el-popover>
-          <div class="state-icon state-icon-main">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-              class="h-15 w-15 float-right pt-3">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-                d="M16.469,8.924l-2.414,2.413c-0.156,0.156-0.408,0.156-0.564,0c-0.156-0.155-0.156-0.408,0-0.563l2.414-2.414c1.175-1.175,1.175-3.087,0-4.262c-0.57-0.569-1.326-0.883-2.132-0.883s-1.562,0.313-2.132,0.883L9.227,6.511c-1.175,1.175-1.175,3.087,0,4.263c0.288,0.288,0.624,0.511,0.997,0.662c0.204,0.083,0.303,0.315,0.22,0.52c-0.171,0.422-0.643,0.17-0.52,0.22c-0.473-0.191-0.898-0.474-1.262-0.838c-1.487-1.485-1.487-3.904,0-5.391l2.414-2.413c0.72-0.72,1.678-1.117,2.696-1.117s1.976,0.396,2.696,1.117C17.955,5.02,17.955,7.438,16.469,8.924 M10.076,7.825c-0.205-0.083-0.437,0.016-0.52,0.22c-0.083,0.205,0.016,0.437,0.22,0.52c0.374,0.151,0.709,0.374,0.997,0.662c1.176,1.176,1.176,3.088,0,4.263l-2.414,2.413c-0.569,0.569-1.326,0.883-2.131,0.883s-1.562-0.313-2.132-0.883c-1.175-1.175-1.175-3.087,0-4.262L6.51,9.227c0.156-0.155,0.156-0.408,0-0.564c-0.156-0.156-0.408-0.156-0.564,0l-2.414,2.414c-1.487,1.485-1.487,3.904,0,5.391c0.72,0.72,1.678,1.116,2.696,1.116s1.976-0.396,2.696-1.116l2.414-2.413c1.487-1.486,1.487-3.905,0-5.392C10.974,8.298,10.55,8.017,10.076,7.825">
-              </path>
-            </svg>
-          </div>
-          <el-text class="font-data state-icon-main">{{ state.show.speed }}</el-text>
-        </div>
-        <div class="showItem">
-          <span class="font-background" style="font-size: larger;">带宽</span>
-          <el-text size="small" class="mx-1">{{ state.maxSpeed ? '/' + formatter(state.maxSpeed, 2, [0, 0, 0, 0, 0, 0]) : ""
-          }}</el-text>
-          <el-button type="primary" style="height: 15px;" :icon="Edit" link @click="EditSpeedVisible = true" />
-          <div class="state-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-              class="h-15 w-15 float-right pt-3">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-            </svg>
-          </div>
-          <el-text class="font-data">{{ state.show.speedBit }}</el-text>
-        </div>
-      </div>
-
-      <div style="width: fit-content;display: block;margin-top:2ch;margin-left: auto;margin-right: auto;">
-        <a class="button" v-if="!isRunning && !state.isChecking" @click="tryStart">
-          <svg t="1694957757562" class="svg-icon"
-            viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4036" width="200" height="200">
-            <path
-              d="M823.8 603.5l-501.2 336c-50.7 34-119.3 20.4-153.2-30.2-12.2-18.2-18.7-39.6-18.7-61.5v-672c0-61 49.5-110.4 110.4-110.4 21.9 0 43.3 6.5 61.5 18.7l501.1 336c50.7 34 64.2 102.6 30.2 153.2-7.8 11.9-18.1 22.2-30.1 30.2z m0 0"
-              p-id="4037"></path>
-          </svg>
-        </a>
-        <a class="button" v-if="state.isChecking">
-          <el-icon :size="60" class="is-loading el-icon-loading">
-            <Loading />
-          </el-icon>
-        </a>
-        <a class="button" v-if="isRunning && !state.isChecking" @click="isRunning = false">
-          <svg t="1694958268344" fill="white" style="width: 80px;margin-top: -30px;" viewBox="0 0 1024 1024" version="1.1"
-            xmlns="http://www.w3.org/2000/svg" p-id="7667" width="200" height="200">
-            <path
-              d="M352 768c-17.664 0-32-14.304-32-32V288c0-17.664 14.336-32 32-32s32 14.336 32 32v448c0 17.696-14.336 32-32 32zM672 768c-17.696 0-32-14.304-32-32V288c0-17.664 14.304-32 32-32s32 14.336 32 32v448c0 17.696-14.304 32-32 32z"
-              p-id="7668"></path>
-          </svg>
-        </a>
-      </div>
-      <el-button style="float: left;margin-top: -20px;margin-right: 3px" type="primary" :icon="Histogram" link
-        @click="showMark.show = true" />
-        <el-button style="float: left;margin-top: -20px;margin-left: 39px" type="primary" :icon="FullScreen" link
-        @click="isFullScreen = true" />
-      <el-button style="float: right;margin-top: -20px;margin-right: 3px" type="primary" :icon="TrendCharts" link
-        v-if="!chartShow" @click="chartShow = true" />
-      <el-button style="float: right;margin-top: -20px;margin-right: 3px" type="primary" :icon="Hide" link
-        v-if="chartShow" @click="chartShow = false" />
-      <div v-show="chartShow" ref="chartContainer" style="width: 100%; height: 400px;"></div>
     </div>
-  </div>
 
-  <el-dialog style="width: 90%;max-width: 700px;" v-model="EditTableVisible" title="自定义地址">
-    <el-table v-if="customNodes.length" :data="customNodes" style="width: 100%" max-height="300">
-      <el-table-column prop="label" label="名称" width="100" />
-      <el-table-column prop="value" label="URL" />
-      <el-table-column fixed="right" label="" width="50">
-        <template #default="scope">
-          <el-button type="danger" link :icon="Delete" @click.prevent="customNodes.splice(scope.$index, 1)" />
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-empty v-else description="没有自定义地址" />
-    <el-button class="mt-4" style="width: 100%" @click="addTableVisible = true;">添加地址</el-button>
-  </el-dialog>
-
-  <el-dialog style="width: 90%;max-width: 700px;" v-model="addTableVisible" title="添加链接">
-    <el-form :model="addForm">
-      <el-form-item label="名称:" label-width='50px'>
-        <el-input v-model="addForm.label" autocomplete="off" />
-      </el-form-item>
-      <el-form-item label="url:" label-width='50px'>
-        <el-input v-model="addForm.value" autocomplete="off">
-          <template #suffix>
-            <el-icon v-if="urlParser(addForm.value)">
-              <CircleCheck />
-            </el-icon>
-          </template>>
-        </el-input>
-      </el-form-item>
-    </el-form>
-    <el-alert title="注意：" type="warning">
-      在浏览器工作的程序受到浏览器安全策略的限制
-      <br>
-      以下情况你将无法正常使用链接
-      <br>
-      1.你使用https协议打开的本站，但是url是http协议
-      <br>
-      2.目标服务器返回的Access-Control-Allow-Origin响应头没有允许本站
-      <br>
-      具体细节请在报错后查看控制台
-    </el-alert>
-    <el-alert title="免责声明：" type="error">
-      请勿用于非法用途，使用本功能造成的一切后果由用户承担
-    </el-alert>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="addTableVisible = false">取消</el-button>
-        <el-button type="primary" :disabled="!urlParser(addForm.value) || !addForm.label || addForm.checking"
-          @click="addNode()">确认
-          <el-icon v-if="addForm.checking" class="is-loading">
-            <Loading />
-          </el-icon>
-        </el-button>
-      </span>
-    </template>
-  </el-dialog>
-  <el-dialog style="width: 90%;max-width: 300px;" v-model="EditMaxVisible" title="设置上限自动停止">
-    <el-form>
-      <div class="mt-4">
-        <el-input type="number" min='1' v-model="maxUseInput.num" autocomplete="off" placeholder="留空则无上限"
-          class="input-with-select">
-          <template #append>
-            <el-select v-model="maxUseInput.type" placeholder="Select" style="width: 65px">
-              <el-option label="MB" value="MB" />
-              <el-option label="GB" value="GB" />
-              <el-option label="TB" value="TB" />
-            </el-select>
-          </template>
-        </el-input>
+    <div class="ios-card glass">
+      <div class="card-header">
+        <span class="card-title">线程数</span>
+        <span class="card-value">{{ threadNum }}</span>
       </div>
-    </el-form>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="EditMaxVisible = false">取消</el-button>
-        <el-button type="primary" @click="editMaxUse()">
-          确定
-        </el-button>
-      </span>
-    </template>
-  </el-dialog>
-  <el-dialog style="width: 90%;max-width: 350px;" v-model="EditSpeedVisible" title="设置带宽上限">
-    <el-form>
-      <div class="mt-4">
-        <el-input type="number" min='1' v-model="maxSpeedInput.num" autocomplete="off" placeholder="留空则无上限"
-          class="input-with-select">
-          <template #append>
-            <el-select v-model="maxSpeedInput.type" placeholder="Select" style="width: 80px">
-              <el-option label="Mbps" value="Mbps" />
-              <el-option label="Gbps" value="Gbps" />
-            </el-select>
+      <div class="ios-slider-wrapper">
+        <el-slider :show-tooltip="false" :min="1" :max="64" v-model="threadNum" class="ios-slider-custom" />
+      </div>
+      <div class="mini-settings">
+        <div class="mini-setting-item">
+          <span class="mini-label">后台运行</span>
+          <el-switch v-model="runBackground" class="ios-switch-custom" />
+        </div>
+        <div class="mini-setting-item">
+          <span class="mini-label">自动运行</span>
+          <el-switch v-model="autoStart" class="ios-switch-custom" />
+        </div>
+      </div>
+    </div>
+
+    <div class="ios-card glass">
+      <div class="data-grid">
+        <div class="data-item">
+          <div class="data-header">
+            <span class="data-label">总流量</span>
+            <span v-if="state.maxUse" class="data-limit">/ {{ formatter(state.maxUse, 0, [0, 0, 0, 0, 0, 0]) }}</span>
+            <button class="icon-btn-small" @click="EditMaxVisible = true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="data-value">{{ state.show.allUsed }}</div>
+        </div>
+
+        <div class="data-item highlight">
+          <div class="data-header">
+            <span class="data-label">{{ isRunning ? '实时速度' : '平均速度' }}</span>
+            <el-popover placement="top-start" title="用量预测" :width="180" trigger="click" popper-class="ios-popper">
+              <template #reference>
+                <button class="icon-btn-small">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </button>
+              </template>
+              <div class="predict-grid">
+                <div class="predict-item">
+                  <span class="predict-label">每分钟</span>
+                  <span class="predict-value">{{ state.predict.min }}</span>
+                </div>
+                <div class="predict-item">
+                  <span class="predict-label">每小时</span>
+                  <span class="predict-value">{{ state.predict.hour }}</span>
+                </div>
+                <div class="predict-item">
+                  <span class="predict-label">每天</span>
+                  <span class="predict-value">{{ state.predict.day }}</span>
+                </div>
+                <div class="predict-item">
+                  <span class="predict-label">每月</span>
+                  <span class="predict-value">{{ state.predict.mon }}</span>
+                </div>
+              </div>
+            </el-popover>
+          </div>
+          <div class="data-value speed-value">{{ state.show.speed }}</div>
+        </div>
+
+        <div class="data-item">
+          <div class="data-header">
+            <span class="data-label">带宽</span>
+            <span v-if="state.maxSpeed" class="data-limit">/ {{ formatter(state.maxSpeed, 2, [0, 0, 0, 0, 0, 0]) }}</span>
+            <button class="icon-btn-small" @click="EditSpeedVisible = true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="data-value">{{ state.show.speedBit }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ios-card glass control-card">
+      <div class="control-row">
+        <button class="play-btn" v-if="!isRunning && !state.isChecking" @click="tryStart" :disabled="state.isChecking">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+        </button>
+        <button class="play-btn loading" v-if="state.isChecking">
+          <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+          </svg>
+        </button>
+        <button class="play-btn pause" v-if="isRunning && !state.isChecking" @click="isRunning = false">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="4" width="4" height="16"></rect>
+            <rect x="14" y="4" width="4" height="16"></rect>
+          </svg>
+        </button>
+
+        <button class="control-icon-btn" @click="chartShow = !chartShow" title="图表">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="12 3 20 7.5 20 16.5 12 21 4 16.5 4 7.5 12 3"></polyline>
+            <polyline points="12 12 20 7.5"></polyline>
+            <polyline points="12 12 12 21"></polyline>
+            <polyline points="12 12 4 7.5"></polyline>
+          </svg>
+        </button>
+        <button class="control-icon-btn" @click="isFullScreen = true" title="全屏">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+          </svg>
+        </button>
+      </div>
+      <div v-show="chartShow" ref="chartContainer" class="chart-container"></div>
+    </div>
+
+    <el-dialog v-model="EditTableVisible" title="自定义地址" class="ios-dialog-custom" append-to-body>
+      <el-table v-if="customNodes.length" :data="customNodes" style="width: 100%" max-height="300">
+        <el-table-column prop="label" label="名称" width="100" />
+        <el-table-column prop="value" label="URL" />
+        <el-table-column fixed="right" label="" width="50">
+          <template #default="scope">
+            <el-button type="danger" link @click.prevent="customNodes.splice(scope.$index, 1)" />
           </template>
-        </el-input>
-        <br><br>
-        <el-alert title="注意：" type="warning">
-          浏览器会使用缓存策略<br>只能限制平均速度，无法限制峰值速度!<br>部分链接无法限速，请使用其它限速方法
+        </el-table-column>
+      </el-table>
+      <el-empty v-else description="没有自定义地址" />
+      <el-button class="mt-4 ios-btn-full" type="primary" @click="addTableVisible = true;">添加地址</el-button>
+    </el-dialog>
+
+    <el-dialog v-model="addTableVisible" title="添加链接" class="ios-dialog-custom" append-to-body>
+      <el-form :model="addForm" label-position="top">
+        <el-form-item label="名称">
+          <el-input v-model="addForm.label" autocomplete="off" placeholder="节点名称" />
+        </el-form-item>
+        <el-form-item label="URL">
+          <el-input v-model="addForm.value" autocomplete="off" placeholder="https://...">
+            <template #suffix>
+              <el-icon v-if="urlParser(addForm.value)" color="#34c759">
+                <Check />
+              </el-icon>
+            </template>
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <div class="alert-container">
+        <el-alert title="注意" type="warning" :closable="false" show-icon>
+          在浏览器工作的程序受到浏览器安全策略的限制。
+        </el-alert>
+        <div class="alert-spacer"></div>
+        <el-alert title="免责声明" type="error" :closable="false" show-icon>
+          请勿用于非法用途，使用本功能造成的一切后果由用户承担。
         </el-alert>
       </div>
-    </el-form>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="EditSpeedVisible = false">取消</el-button>
-        <el-button type="primary" @click="editSpeedUse()">
-          确定
-        </el-button>
-      </span>
-    </template>
-  </el-dialog>
-  <MarkUI :show="showMark" :loginInfo="loginInfo" />
-  <audio v-if="isMobile && !isIOS && !isMiuiBrowser && runBackground" @canplay="() => { if (isRunning) audioDom.play() }"
-    @pause="() => { if (runBackground) isRunning = false }" @play="isRunning = true" controls loop ref="audioDom"
-    style="display:none">
-    <source :src="andoridSound" type="audio/mpeg">
-  </audio>
-  <audio v-if="isIOS && runBackground" @canplay="() => { if (isRunning) audioDom.play() }"
-    @pause="() => { if (runBackground) isRunning = false }" @play="isRunning = true" controls loop ref="audioDom"
-    style="display:none">
-    <source :src="iosSound" type="audio/mpeg">
-  </audio>
-  <FullScreenUI v-model="isFullScreen" :isRunning="isRunning" :state="state" />
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="addTableVisible = false">取消</el-button>
+          <el-button type="primary" :disabled="!urlParser(addForm.value) || !addForm.label || addForm.checking"
+            @click="addNode()">确认
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="EditMaxVisible" title="设置上限自动停止" class="ios-dialog-custom mini-dialog" append-to-body>
+      <div class="input-with-select">
+        <el-input type="number" min="1" v-model="maxUseInput.num" placeholder="留空则无上限" />
+        <el-select v-model="maxUseInput.type" style="width: 100px">
+          <el-option label="MB" value="MB" />
+          <el-option label="GB" value="GB" />
+          <el-option label="TB" value="TB" />
+        </el-select>
+      </div>
+      <template #footer>
+        <el-button type="primary" @click="editMaxUse()" class="ios-btn-full">确定</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="EditSpeedVisible" title="设置带宽上限" class="ios-dialog-custom mini-dialog" append-to-body>
+      <div class="input-with-select">
+        <el-input type="number" min="1" v-model="maxSpeedInput.num" placeholder="留空则无上限" />
+        <el-select v-model="maxSpeedInput.type" style="width: 100px">
+          <el-option label="Mbps" value="Mbps" />
+          <el-option label="Gbps" value="Gbps" />
+        </el-select>
+      </div>
+      <template #footer>
+        <el-button type="primary" @click="editSpeedUse()" class="ios-btn-full">确定</el-button>
+      </template>
+    </el-dialog>
+
+    <audio v-if="isMobile && !isIOS && !isMiuiBrowser && runBackground" @canplay="() => { if (isRunning) audioDom.play() }"
+      @pause="() => { if (runBackground) isRunning = false }" @play="isRunning = true" controls loop ref="audioDom"
+      style="display:none">
+      <source :src="andoridSound" type="audio/mpeg">
+    </audio>
+    <audio v-if="isIOS && runBackground" @canplay="() => { if (isRunning) audioDom.play() }"
+      @pause="() => { if (runBackground) isRunning = false }" @play="isRunning = true" controls loop ref="audioDom"
+      style="display:none">
+      <source :src="iosSound" type="audio/mpeg">
+    </audio>
+    <FullScreenUI v-model="isFullScreen" :isRunning="isRunning" :state="state" />
+  </div>
 </template>
 
 <script lang="ts" setup>
 import type { EChartsType } from "echarts";
 import iosSound from "../assets/ios.mp3";
 import andoridSound from "../assets/android.mp3";
+import { ElMessage } from 'element-plus'
+import nodesJson from "../assets/nodes.json"
+import { ref, watch, watchEffect, type Ref, reactive, onMounted, onUnmounted } from 'vue'
+import { toClipboard } from '@soerenmartius/vue3-clipboard'
+import FullScreenUI from './FullScreen.vue'
+import * as echarts from 'echarts';
+import { Check } from '@element-plus/icons-vue'
+
 const props = defineProps({
   isVisible: Boolean
 })
-import { ElMessage } from 'element-plus'
-import nodesJson from "../assets/nodes.json"
-import { Link, Edit, Delete, CircleCheck, Loading, CopyDocument, TrendCharts, Hide, Histogram, Calendar,FullScreen } from '@element-plus/icons-vue'
-import { ref, watch,watchEffect, type Ref, reactive } from 'vue'
-import { toClipboard } from '@soerenmartius/vue3-clipboard'
-import MarkUI from './Mark.vue'
-import FullScreenUI from './FullScreen.vue'
 
-const showMark = ref({ show: false })
 const customNodes = reactive(localStorage.customNodes ? JSON.parse(localStorage.customNodes) : [])
-const OnlineNodes: {
-  label: string;
-  options: {
-    value: string;
-    label: string;
-  }[];
-}[] = []
+const OnlineNodes: any[] = []
 for(let groupName in nodesJson) {
   const group=nodesJson[groupName as keyof typeof nodesJson]
-  const temp: {
-    label: string;
-    options: {
-      value: string;
-      label: string;
-    }[];
-  }={"label":groupName,options:[]}
+  const temp: any ={"label":groupName,options:[]}
   for(let node in group) {
     temp.options.push({"value":group[node as keyof typeof group],"label":node})
   }
   OnlineNodes.push(temp)
 }
-const nodes: Ref<{
-  label: string;
-  options: {
-    value: string;
-    label: string;
-  }[];
-}[]> = ref(OnlineNodes)
+const nodes: Ref<any[]> = ref(OnlineNodes)
 if (customNodes.length) {
   nodes.value = [{ "label": "自定义", "options": customNodes}].concat(OnlineNodes)
 }
-watch(customNodes, async (newState, oldState) => {
+watch(customNodes, async (newState) => {
   if (customNodes.length) {
     nodes.value = [{ "label": "自定义", "options": customNodes }].concat(OnlineNodes)
   } else nodes.value = OnlineNodes
@@ -294,17 +277,8 @@ watch(customNodes, async (newState, oldState) => {
 }, { deep: true })
 
 const state = reactive({
-  show: {
-    allUsed: '-',
-    speed: '-',
-    speedBit: '-'
-  },
-  predict: {
-    min: '-',
-    hour: '-',
-    day: '-',
-    mon: '-',
-  },
+  show: { allUsed: '-', speed: '-', speedBit: '-' },
+  predict: { min: '-', hour: '-', day: '-', mon: '-' },
   isChecking: false,
   bytesUsed: 0,
   logged: 0,
@@ -318,7 +292,6 @@ const state = reactive({
 })
 const isRunning = ref(false)
 const isFullScreen = ref(false)
-const loginInfo = reactive({ AccessToken: localStorage.AccessToken ? localStorage.AccessToken : "" })
 const chartShow = ref(localStorage.chartShow ? localStorage.chartShow === 'true' : false)
 const threadNum = ref(localStorage.threadNum ? Number(localStorage.threadNum) : 8)
 const runBackground = ref(localStorage.runBackground ? localStorage.runBackground === 'true' : false)
@@ -328,12 +301,6 @@ const runUrl = ref(localStorage.url ? localStorage.url : nodes.value[0].options[
 var tasks: Array<number> = []
 
 onMounted(() => {
-  // setTimeout(() => {
-  //   ElMessage.warning({
-  //     dangerouslyUseHTMLString: true,
-  //     message: '本站将不再内置大厂链接 建议使用自定义节点功能',
-  //   })
-  // },500)
   autoStart.value&&tryStart();
 })
 
@@ -346,42 +313,33 @@ const tryStart = async () => {
   const urlStatus = await checkUrl(runUrl.value)
   state.isChecking = false
   if (!urlStatus.status) {
-    ElMessage.error({
-      dangerouslyUseHTMLString: true,
-      message: urlStatus.info
-    })
+    ElMessage.error({ dangerouslyUseHTMLString: true, message: urlStatus.info })
   } else {
     isRunning.value = true
   }
 }
+
 const block_list=["ljxnet.cn","netart.cn",".gov.cn"]
 const checkUrl = async (url: string) => {
   var status = true
   let info = ''
   try {
     let structUrl = new URL(url)
-    if (block_list.some((i)=>structUrl.host.endsWith(i))) {
-      throw '你不对劲，我要拿小本本把你记下来然后交给警察蜀黍！'
-    }
-
+    if (block_list.some((i)=>structUrl.host.endsWith(i))) throw '你不对劲！'
     const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 5000);
+    setTimeout(() => controller.abort(), 5000);
     const response = await fetch(url, { cache: "no-store", mode: 'cors', referrerPolicy: 'no-referrer' ,signal: controller.signal})
-    if (response.status == 404) throw "资源响应异常" + response.status
+    if (response.status == 404) throw "资源响应异常 404"
     if (!response.body) throw "资源响应异常 Nobody"
     const reader = response.body.getReader();
-    const { value, done } = await reader.read();
+    const { value } = await reader.read();
     if (!value || value.length <= 0) throw "资源响应异常 Nobody";
     reader.cancel()
   } catch (err) {
     status = false
-    if (err instanceof Error) info = err.message
-    else info = String(err)
+    info = err instanceof Error ? err.message : String(err)
   }
-  return {
-    status: status,
-    info: info,
-  }
+  return { status, info }
 }
 
 let solvedRunUrl = ''
@@ -392,18 +350,14 @@ async function apiSolver(){
   }
   let host=runUrl.value.split("NetworkPanelApi://")[1]
   let resp:any = await fetch(import.meta.env.VITE_API_URL+"url.ajax?"+new URLSearchParams({host:host,cache:window.location.host}), {
-      mode: "cors",
-      redirect: "follow",
-      referrerPolicy: "no-referrer"
+      mode: "cors", redirect: "follow", referrerPolicy: "no-referrer"
     });
   resp = await resp.json()
-  if(resp['status']!=0){
-    isRunning.value=false;
-    return
-  }
+  if(resp['status']!=0){ isRunning.value=false; return }
   solvedRunUrl = resp['url']
 }
-watch(isRunning, async (newState, oldState) => {
+
+watch(isRunning, async (newState) => {
   clearChart()
   if (newState) {
     state.isChecking = true
@@ -411,8 +365,7 @@ watch(isRunning, async (newState, oldState) => {
     state.isChecking = false
     if(!isRunning.value) return
     if (state.maxUse && state.bytesUsed >= state.maxUse) {
-      state.bytesUsed = 0;
-      state.logged = 0;
+      state.bytesUsed = 0; state.logged = 0;
     }
     state.lastLogTime = new Date().getTime() / 1000;
     state.startUse = state.bytesUsed
@@ -421,58 +374,22 @@ watch(isRunning, async (newState, oldState) => {
     state.recordTime = new Date().getTime() / 1000;
     for (let i = 0; i < threadNum.value; i++)startThread(i)
     tasks.push(setInterval(frameEvent, 16))
-    tasks.push(setInterval(uploadLog, 60000))
     tasks.push(setInterval(apiSolver, 60000))
     secEvent()
     tasks.push(setInterval(secEvent, 1000))
     runBackground.value ? audioDom.value?.play() : ''
   } else {
-    tasks.map((i) => console.log(i))
     tasks.map((i) => clearInterval(i))
     tasks = []
-    uploadLog()
     audioDom.value?.pause()
     var speed = (state.bytesUsed - state.startUse) / (new Date().getTime() / 1000 - state.startTime)
     setSpeed(speed)
     setUsed()
-    if (!props.isVisible) {
-      setTitle()
-    }
+    if (!props.isVisible) setTitle()
   }
 })
 
-async function uploadLog() {
-  let now = new Date().getTime() / 1000
-  let num = state.bytesUsed - state.logged
-  let time = now - state.lastLogTime
-
-  state.logged = state.bytesUsed
-  state.lastLogTime = now
-  // if (loginInfo.AccessToken) {
-    let resp = await fetch(import.meta.env.VITE_API_URL+"log", {
-      method: "POST",
-      mode: "cors",
-      redirect: "follow",
-      referrerPolicy: "no-referrer",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        AccessToken: loginInfo.AccessToken,
-        url: runUrl.value,
-        threadNum: threadNum.value,
-        used: num,
-        time: time
-      })
-    });
-    resp = await resp.json()
-    if (resp.status == -1) {
-      loginInfo.AccessToken = ''
-    }
-  // }
-}
-
-watch(props, async (newState, oldState) => {
+watch(props, async (newState) => {
   if (!newState.isVisible && runBackground.value && isRunning.value) secEvent()
   if (!newState.isVisible && !runBackground.value && isRunning.value) isRunning.value = false
   if (newState.isVisible) setTitle()
@@ -485,67 +402,21 @@ watch(threadNum, async (newState, oldState) => {
   }
 })
 
-watch(runBackground, async (newState, oldState) => {
-  localStorage.runBackground = newState
-})
-
-watch(chartShow, async (newState, oldState) => {
+watch(runBackground, async (newState) => { localStorage.runBackground = newState })
+watch(chartShow, async (newState) => {
   localStorage.chartShow = newState
-  if (newState) {
-    setTimeout(() => myChart.resize(), 100)
-  }
+  if (newState) setTimeout(() => myChart.resize(), 100)
 })
+watch(runUrl, async () => { localStorage.url = runUrl.value; if (isRunning.value) apiSolver() })
+watchEffect(() => { localStorage.autoStart = autoStart.value; })
 
-watch(runUrl, async (newState, oldState) => {
-  localStorage.url = newState
-  if (isRunning.value) {
-    apiSolver()
-  }
-})
-
-watch(loginInfo, async (newState, oldState) => {
-  localStorage.AccessToken = newState.AccessToken
-})
-
-watchEffect(() => {
-  localStorage.autoStart = autoStart.value;
-})
 const copyUrl = () => {
-  toClipboard(runUrl.value).then(() => {
-    ElMessage.success({
-      dangerouslyUseHTMLString: true,
-      message: '已复制当前链接',
-    })
-  })
+  toClipboard(runUrl.value).then(() => ElMessage.success('已复制当前链接'))
 }
 
-window.addEventListener("paste", function (e) {
-  if (!(e.clipboardData && e.clipboardData.items && document.activeElement?.nodeName != 'INPUT'))return;
-  for (var i = 0, len = e.clipboardData.items.length; i < len; i++) {
-    var itemz = e.clipboardData.items[i];
-    if (itemz.type === "text/plain") {
-      e.clipboardData.items[i].getAsString(async function (str){
-        let clipText = urlParser(str)
-        if (clipText) {
-          ElMessage.info('读取剪切板链接成功,正在检测链接可用性')
-          let ret=await checkUrl(clipText)
-          if(ret.status){
-            runUrl.value = clipText
-            ElMessage.success('读取剪切板链接成功')
-          }else{
-            ElMessage.error(ret.info)
-          }
-        } else {
-          ElMessage.error('没有检测到剪切板中的链接')
-        }
-      })
-      break
-    }
-  }
-})
 var setTitle = (speed: number = 0) => {
   if (props.isVisible) {
-    document.title = '网络面板'
+    document.title = 'ChuiYan SpeedTest'
   } else {
     if (isRunning.value) {
       document.title = formatter(state.bytesUsed, 0, [0, 0, 0, 0, 0, 0]) + ' ' + formatter(speed, 1, [0, 0, 0, 0, 0, 0])
@@ -556,10 +427,12 @@ var setTitle = (speed: number = 0) => {
     }
   }
 }
+
 var setUsed = () => {
   if (!state.bytesUsed) state.show.allUsed = '-'
   state.show.allUsed = formatter(state.bytesUsed, 0, [0, 0, 1, 2, 2, 2])
 }
+
 var setSpeed = (speed: number) => {
   state.show.speed = formatter(speed, 1, [0, 0, 1, 2, 2, 2])
   state.show.speedBit = formatter(speed * 8, 2, [0, 0, 0, 2, 2, 2])
@@ -571,10 +444,9 @@ var setSpeed = (speed: number) => {
 
 var frameEvent = () => {
   if (props.isVisible) setUsed()
-  if (state.maxUse && state.bytesUsed >= state.maxUse) {
-    isRunning.value = false
-  }
+  if (state.maxUse && state.bytesUsed >= state.maxUse) isRunning.value = false
 }
+
 var secEvent = () => {
   var speed = (state.bytesUsed - state.recordUse) / (new Date().getTime() / 1000 - state.recordTime)
   if (!isNaN(speed)) updateChart(speed)
@@ -590,7 +462,6 @@ var secEvent = () => {
   state.recordUse = state.bytesUsed
   state.recordTime = new Date().getTime() / 1000;
 }
-
 
 function formatter(num: number, desIndex: number, flo: Array<number>) {
   const describeString = [['B', 'KB', 'MB', 'GB', 'TB', 'PB'],
@@ -611,19 +482,14 @@ function formatter(num: number, desIndex: number, flo: Array<number>) {
 const speedCtr=()=>{
   if(state.bytesUsed-state.recordUse>state.maxSpeed/8){
     return new Promise((resolve)=>{
-      setTimeout(()=>{
-        resolve(0)
-      },1000-(new Date().getTime()%1000))
+      setTimeout(()=>{ resolve(0) },1000-(new Date().getTime()%1000))
     })
   }
 }
 
 async function startThread(index: number) {
   try {
-    if(solvedRunUrl==""){
-      isRunning.value=false
-      return
-    }
+    if(solvedRunUrl==""){ isRunning.value=false; return }
     let _url=solvedRunUrl
     const response = await fetch(_url, { cache: "no-store", mode: 'cors', referrerPolicy: 'no-referrer' })
     if (!response.body) throw "Nobody"
@@ -637,8 +503,7 @@ async function startThread(index: number) {
       const { value } = await reader.read();
       let chunkLength = value?.length
       if (!chunkLength || solvedRunUrl != _url) {
-        startThread(index);
-        break;
+        startThread(index); break;
       }
       let usefulChunkLength = chunkLength
       if (decodeLength >= realLength) {
@@ -652,7 +517,6 @@ async function startThread(index: number) {
     }
     reader.cancel()
   } catch (err) {
-    console.log(err)
     if (isRunning.value) startThread(index);
   }
 }
@@ -661,154 +525,118 @@ const EditTableVisible = ref(false)
 const addTableVisible = ref(false)
 const EditMaxVisible = ref(false)
 const EditSpeedVisible = ref(false)
-const addForm = ref({
-  label: '',
-  value: '',
-  checking: false
-})
+const addForm = ref({ label: '', value: '', checking: false })
+
 const urlParser = (ipt: string) => {
   var a = ipt.match(/https?:\/\/([\w-]+\.)+[\w-]+(:[0-9]+)?(\/\S*)?/);
   return a ? a[0] : '';
 }
+
 const addNode = async () => {
   addForm.value.value = urlParser(addForm.value.value)
   addForm.value.checking = true
   const urlStatus = await checkUrl(addForm.value.value)
+  addForm.value.checking = false
   if (!urlStatus.status) {
-    addForm.value.checking = false
-    ElMessage.error({
-      dangerouslyUseHTMLString: true,
-      message: urlStatus.info,
-    })
+    ElMessage.error({ dangerouslyUseHTMLString: true, message: urlStatus.info })
     return
   }
-  addForm.value.checking = false
-  customNodes.push({
-    label: addForm.value.label,
-    value: addForm.value.value,
-  })
-  addForm.value.label = ''
-  addForm.value.value = ''
-  addTableVisible.value = false
+  customNodes.push({ label: addForm.value.label, value: addForm.value.value })
+  addForm.value.label = ''; addForm.value.value = ''; addTableVisible.value = false
 }
 
-const maxUseInput: Ref<{
-  num: number | null;
-  type: "GB" | "MB" | "TB";
-}> = ref({
-  num: null,
-  type: 'GB',
-})
+const maxUseInput: Ref<any> = ref({ num: null, type: 'GB' })
 const editMaxUse = () => {
-  var map = {
-    "MB": 1024 * 1024,
-    "GB": 1024 * 1024 * 1024,
-    "TB": 1024 * 1024 * 1024 * 1024
-  }
+  var map: any = { "MB": 1024 * 1024, "GB": 1024 * 1024 * 1024, "TB": 1024 * 1024 * 1024 * 1024 }
   var tmp = 0
-  if (maxUseInput.value.num) {
-    tmp = Math.floor(maxUseInput.value.num * map[maxUseInput.value.type])
-  }
-  state.maxUse = tmp
-  localStorage.maxUse = tmp
-  maxUseInput.value.num = null
-  EditMaxVisible.value = false
+  if (maxUseInput.value.num) tmp = Math.floor(maxUseInput.value.num * map[maxUseInput.value.type])
+  state.maxUse = tmp; localStorage.maxUse = tmp; maxUseInput.value.num = null; EditMaxVisible.value = false
 }
 
-const maxSpeedInput: Ref<{
-  num: number | null;
-  type: "Gbps" | "Mbps" | "Kbps";
-}> = ref({
-  num: null,
-  type: 'Mbps',
-})
-
+const maxSpeedInput: Ref<any> = ref({ num: null, type: 'Mbps' })
 const editSpeedUse = () => {
-  var map = {
-    "Kbps": 1024 ,
-    "Mbps": 1024 * 1024,
-    "Gbps": 1024 * 1024 * 1024
-  }
+  var map: any = { "Kbps": 1024 , "Mbps": 1024 * 1024, "Gbps": 1024 * 1024 * 1024 }
   var tmp = 0
-  if (maxSpeedInput.value.num) {
-    tmp = Math.floor(maxSpeedInput.value.num * map[maxSpeedInput.value.type])
-  }
-  state.maxSpeed = tmp
-  localStorage.maxSpeed = tmp
-  maxSpeedInput.value.num = null
-  EditSpeedVisible.value = false
+  if (maxSpeedInput.value.num) tmp = Math.floor(maxSpeedInput.value.num * map[maxSpeedInput.value.type])
+  state.maxSpeed = tmp; localStorage.maxSpeed = tmp; maxSpeedInput.value.num = null; EditSpeedVisible.value = false
 }
+
 var isMobile = /Mobi|Android|iPhone|Macintosh/i.test(navigator.userAgent)
 var isMiuiBrowser = /MiuiBrowser/i.test(navigator.userAgent)
 var isIOS = /iPhone|Macintosh/i.test(navigator.userAgent)
 
 const audioDom: Ref<any> = ref(null);
-
-
-import { onMounted, onUnmounted } from 'vue';
-import * as echarts from 'echarts';
-
 const chartContainer = ref(null);
 
 let myChart: EChartsType;
 let updateChart = (n:number) => {};
 let clearChart=()=>{};
+
 onMounted(() => {
   myChart = echarts.init(chartContainer.value);
+  const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   const chartOption = {
+    backgroundColor: 'transparent',
+    toolbox: {
+      show: true,
+      feature: {
+        saveAsImage: {
+          show: true,
+          title: '下载',
+          iconStyle: { 
+            borderColor: isDark ? '#ffffff' : '#1c1c1e',
+            borderWidth: 1.5
+          }
+        }
+      },
+      right: 10,
+      top: 0
+    },
     tooltip: {
       trigger: 'axis',
+      backgroundColor: isDark ? 'rgba(28, 28, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+      borderColor: 'transparent',
+      textStyle: { color: isDark ? '#ffffff' : '#1c1c1e' },
       formatter: function (params: any) {
         let speed = formatter(params[0].data[1], 1, [0, 0, 1, 2, 2, 2]);
-        return `${new Date(params[0].data[0] * 1000).toLocaleString()}<br />
-              ${speed}`;
+        return `${new Date(params[0].data[0] * 1000).toLocaleTimeString()}<br />${speed}`;
       },
-    },
-    toolbox: {
-      feature: {
-        saveAsImage: {}
-      }
-    },
-    title: {
-      left: 'left',
-      text: '速度图表'
     },
     xAxis: {
       type: 'time',
       boundaryGap: false,
-      axisLabel: {
-        show: false
-      },
-      axisTick:{
-        show:false
-      }
+      axisLabel: { show: false },
+      axisTick:{ show:false },
+      splitLine: { show: false }
     },
     yAxis: {
       type: 'value',
       axisLabel: {
+        color: isDark ? '#ffffff' : '#3a3a3c',
         formatter: (val: number) => {
           let a = formatter(val, 1, [0, 0, 0, 0, 0, 0]);
           return a == '-' ? 0 : a
         }
-      }
+      },
+      splitLine: { lineStyle: { color: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' } }
     },
     series: [
       {
         name: '速度',
         type: 'line',
-        smooth: false,
+        smooth: true,
         symbol: 'none',
-        areaStyle: {},
+        lineStyle: { color: '#007aff', width: 3 },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(0, 122, 255, 0.3)' },
+            { offset: 1, color: 'rgba(0, 122, 255, 0)' }
+          ])
+        },
         data: [[new Date().getTime() / 1000,0]]
       }
     ],
-    grid: {
-      x: 0,
-      y: 40,
-      x2: 8,
-      y2: 10,
-      containLabel: true
-    },
+    grid: { x: 10, y: 30, x2: 10, y2: 10, containLabel: true },
   }
 
   myChart.setOption(chartOption);
@@ -816,10 +644,8 @@ onMounted(() => {
   let speedTemp:Array<number>=[]
   let stepLength=1
   clearChart=()=>{
-    // showArray=[]
     speedTemp=[]
     showArray.push([new Date().getTime() / 1000,0])
-    // stepLength=1
   }
   updateChart = (speed:number) => {
     let refresh=false
@@ -827,9 +653,7 @@ onMounted(() => {
     while(speedTemp.length>=stepLength){
       refresh=true
       var tmp = speedTemp.splice(0, stepLength);
-      let avg;
-      if(tmp.includes(0))avg=0
-      else avg = tmp.reduce((a, b) => a + b,0)/stepLength;
+      let avg = tmp.includes(0) ? 0 : tmp.reduce((a, b) => a + b,0)/stepLength;
       showArray.push([new Date().getTime() / 1000,avg])
     }
     while(showArray.length>=200){
@@ -839,8 +663,7 @@ onMounted(() => {
       for (let i = 0; i < lengthToProcess; i += 2) {
         result.push([showArray[i][0],(showArray[i][1] + showArray[i + 1][1]) / 2]);
       }
-      showArray=result
-      stepLength*=2
+      showArray=result; stepLength*=2
     }
     chartOption.series[0].data = showArray
     if(chartShow.value && refresh)myChart.setOption(chartOption);
@@ -848,117 +671,344 @@ onMounted(() => {
   window.addEventListener('resize', () => { myChart.resize() });
 });
 
-onUnmounted(() => {
-  if (myChart) {
-    myChart.dispose();
-  }
-});
+onUnmounted(() => { if (myChart) myChart.dispose(); });
 </script>
+
 <style scoped>
-.ItemContainer {
-  column-count: 3;
-  margin-top: 10px;
+.main-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.card{
-  max-width: 800px;
-  height:fit-content;
-  display: block;
-  margin:0 auto;
-  background-color:#ffffff;
-  padding:2%
+.ios-card {
+  border-radius: 24px;
+  padding: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-stroke);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
 }
 
 @media (prefers-color-scheme: dark) {
-    .card {
-        background-color:rgb(18,18,18);
-    }
-}
-@media screen and (max-width: 800px) {
-  .ItemContainer {
-    column-count: 1;
+  .glass {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
   }
 }
 
-.showItem {
-  border: 1px solid #dbdfea !important;
-  padding: 20px 15px 15px 30px
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-.font-data {
-  white-space: nowrap;
-  grid-column-start: 1;
-  font-weight: 700;
-  line-height: 2.5rem;
-  font-size: 30px;
+.card-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-main);
+  letter-spacing: -0.4px;
 }
 
-.font-background{
-  color: #344357;
-  font-size: 14px;
+.card-value {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ios-blue);
 }
 
-.state-icon {
-  display: block;
-  margin-right: 10px;
-  margin-left: auto;
-  margin-top: -10px;
-  width: 40px;
+.card-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(0, 122, 255, 0.1);
+  color: var(--ios-blue);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.icon-btn:active {
+  transform: scale(0.9);
+  background: rgba(0, 122, 255, 0.2);
+}
+
+.icon-btn svg {
+  width: 20px;
   height: 20px;
-  color: rgb(96,98,102);
 }
 
-.state-icon-main{
-  color: rgb(9,194,222);
+.ios-select-custom {
+  width: 100%;
 }
 
-.svg-icon{
-  fill:rgb(255,255,255);
-  width: 50px;
-  margin-left: 10px;
-  margin-top: -30px;
+.mini-settings {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.el-select-dropdown__wrap{
-  max-height: 60vh;
-}
-.el-icon-loading{
-  margin-top: 40px;
-  color:rgb(255,255,255);
-}
 @media (prefers-color-scheme: dark) {
-    .showItem {
-      border: 1px solid rgb(61,63,66) !important;
-    }
-    .state-icon{
-      color: rgb(165,167,172);
-    }
-    .state-icon-main{
-      color: rgb(30,105,131);
-    }
-    .font-background{
-        color: rgb(193,206,230);
-    }
-    .svg-icon{
-      fill:rgb(220,220,220);
-    }
+  .mini-settings {
+    border-top-color: rgba(255, 255, 255, 0.05);
+  }
 }
 
+.mini-setting-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
+.mini-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
 
-.button {
-  display: block;
-  text-decoration: none;
-  background-color: #485bed;
-  background-image: -webkit-linear-gradient(145deg, #485bed, #6576ff);
-  font-size: 30px;
-  font-weight: 700 !important;
-  margin: 36px;
-  width: 144px;
-  height: 144px;
-  position: relative;
-  text-align: center;
-  line-height: 144px;
+.ios-switch-custom {
+  --el-switch-on-color: #34c759 !important;
+}
+
+:deep(.el-switch.is-checked .el-switch__core) {
+  background-color: #34c759 !important;
+  border-color: #34c759 !important;
+}
+
+:deep(.el-switch__core) {
+  border: none !important;
+  background: rgba(120, 120, 128, 0.16) !important;
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.data-item {
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .data-item {
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.data-item.highlight {
+  background: rgba(0, 122, 255, 0.08);
+  border: 1px solid rgba(0, 122, 255, 0.1);
+}
+
+.data-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.data-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.icon-btn-small {
+  background: none;
+  border: none;
+  padding: 4px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.icon-btn-small:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.icon-btn-small svg {
+  width: 14px;
+  height: 14px;
+}
+
+.data-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.5px;
+}
+
+.speed-value {
+  color: var(--ios-blue);
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.play-btn {
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
-  box-shadow: 0px 3px 8px #485bed, inset 0px 2px 3px #6576ff;
-}</style>
+  border: none;
+  background: var(--ios-blue);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.play-btn:active {
+  transform: scale(0.85);
+}
+
+.play-btn.pause {
+  background: #ff3b30;
+  box-shadow: 0 8px 20px rgba(255, 59, 48, 0.3);
+}
+
+.play-btn svg {
+  width: 32px;
+  height: 32px;
+}
+
+.control-icon-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  padding: 0;
+  flex-shrink: 0;
+  -webkit-appearance: none;
+}
+
+.control-icon-btn svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  .control-icon-btn {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.control-icon-btn:active {
+  transform: scale(0.9);
+}
+
+.chart-container {
+  width: 100%;
+  height: 300px;
+  margin-top: 20px;
+  border-radius: 16px;
+  background: transparent;
+}
+
+.alert-container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.alert-spacer {
+  height: 12px;
+}
+
+:deep(.el-alert) {
+  border-radius: 14px !important;
+  padding: 12px 16px !important;
+}
+
+.ios-btn-full {
+  width: 100%;
+  height: 44px;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+}
+
+@media (max-width: 600px) {
+  .data-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .data-item {
+    padding: 16px;
+    gap: 8px;
+  }
+  .data-value {
+    font-size: 20px;
+  }
+  .ios-card {
+    padding: 16px;
+    border-radius: 20px;
+  }
+  .mini-settings {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .mini-settings {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .control-row {
+    gap: 16px;
+  }
+}
+</style>
+
+<style scoped>
+.input-with-select {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.input-with-select .el-input {
+  flex: 1;
+}
+</style>

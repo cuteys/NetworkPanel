@@ -1,4 +1,4 @@
-# 网络面板
+# ChuiYan SpeedTest
 
 测试您的网速，多出口查询您的ip地址
 

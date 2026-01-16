@@ -3,63 +3,91 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" href="./icon.png">
+    <link rel="icon" href="./favicon.ico">
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-    <title>网络面板 - 实时监测您的网络情况</title>
-    <meta name="keywords" content="网络面板,网络面板官网,网络测速,网速测试,ljxnet,Whoami,flowloss,流量消耗器,流量消耗,定向流量消耗">
-    <meta name="description" content="网络面板(NetworkPanel)是一个在线流量消耗器，可以测试您的网速，监测您的网络环境，提供丰富测试节点，并且长期维护更新">
-    <meta name="author" content="Whoami">
+    <title>ChuiYan SpeedTest - 网络速度测试工具</title>
+    <meta name="keywords" content="网络测速,网速测试,速度测试,网络诊断,ChuiYan SpeedTest">
+    <meta name="description" content="ChuiYan SpeedTest - 专业的网络速度测试工具，支持多节点测试、实时监测网络性能">
+    <meta name="author" content="ChuiYan">
     <meta name="color-scheme" content="light dark">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="网络面板"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ChuiYan SpeedTest"/>
     <meta name="format-detection" content="telephone=no">
-    <link rel="apple-touch-icon-precomposed" href="./icon-fill.png">
-    <meta name="msapplication-TileImage" content="./icon-fill.png">
-    <meta name="msapplication-TileColor" content="#0e90d2">
-    <meta name="baidu-site-verification" content="codeva-WSnRITfckW" />
-    <meta name="baidu_union_verify" content="844e54539687a7613d24c288e42328a4">
+    <link rel="apple-touch-icon-precomposed" href="./favicon.ico">
+    <meta name="msapplication-TileImage" content="./favicon.ico">
+    <meta name="msapplication-TileColor" content="#667eea">
     <link rel="manifest" href="./manifest.webmanifest">
     <style>
-        body{
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
             background-color: #ffffff;
             margin: 0;
-            font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
         }
-        #app{
-            background-color: aliceblue;
+
+        #app {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
         }
+
         @media (prefers-color-scheme: dark) {
             body {
-                background-color: rgb(18, 18, 18);
+                background-color: #1a1a2e;
             }
-            #app{
-                background-color: rgb(33,34,37);
+
+            #app {
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             }
         }
+
         ::-webkit-scrollbar {
-            display: none; /* Chrome Safari */
+            width: 8px;
+            height: 8px;
         }
-        html{
-            scrollbar-width: none;/* Firefox */
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            ::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            html {
+                scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+            }
         }
     </style>
-    <script>
-        var _hmt = _hmt || [];
-        (function() {
-          var hm = document.createElement("script");
-          hm.src = "https://hm.baidu.com/hm.js?25b770e160a55cf023c304174b63571f";
-          var s = document.getElementsByTagName("script")[0]; 
-          s.parentNode.insertBefore(hm, s);
-        })();
-    </script>
-</head>
-
-<body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
     <script>
         var lastTouchEnd = 0
         if (!!('ontouchstart' in window || navigator.maxTouchPoints)) {
@@ -85,6 +113,11 @@
             e.matches ? classVal.add("dark") : classVal.remove("dark")
         });
     </script>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
 </body>
 
 </html>
