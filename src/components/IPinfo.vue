@@ -204,37 +204,132 @@ watchCloudflare("cp.cloudflare.com")
 </script>
 
 <style scoped>
+:root {
+  --glass-bg-light: rgba(255, 255, 255, 0.25);
+  --glass-bg-dark: rgba(30, 30, 30, 0.6);
+  --glass-border-light: rgba(255, 255, 255, 0.3);
+  --glass-border-dark: rgba(255, 255, 255, 0.1);
+  --blur-amount: 20px;
+}
+
 .font-background {
-    color: #344357;
-    font-size: 14px;
+  color: #4a5568;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .card {
-    max-width: 800px;
-    height: fit-content;
-    display: block;
-    margin: 0 auto;
-    background-color: #ffffff;
-    padding: 2%
+  max-width: 800px;
+  height: fit-content;
+  display: block;
+  margin: 0 auto;
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(var(--blur-amount));
+  -webkit-backdrop-filter: blur(var(--blur-amount));
+  border: 1px solid var(--glass-border-light);
+  border-radius: 30px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  padding: 25px;
 }
 
 .ip-table {
-    height: 100%;
-    margin: 20px auto;
-    padding: 10px;
-    border: #ffffff 1px solid;
-    border-radius: 10px;
+  height: 100%;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid var(--glass-border-light);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
 
-    text-align: center;
+.ip-table td {
+  padding: 12px;
+  font-size: 15px;
+  color: #4a5568;
 }
 
 @media (prefers-color-scheme: dark) {
-    .card {
-        background-color: rgb(18, 18, 18);
-    }
+  .card {
+    background: var(--glass-bg-dark);
+    border: 1px solid var(--glass-border-dark);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
 
-    .font-background {
-        color: rgb(193, 206, 230);
-    }
+  .font-background {
+    color: #e2e8f0;
+  }
+
+  .ip-table {
+    border: 1px solid var(--glass-border-dark);
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .ip-table td {
+    color: #cbd5e0;
+  }
+}
+
+/* Glassmorphism for dialogs */
+:deep(.el-dialog) {
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(var(--blur-amount));
+  -webkit-backdrop-filter: blur(var(--blur-amount));
+  border: 1px solid var(--glass-border-light);
+  border-radius: 30px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  :deep(.el-dialog) {
+    background: var(--glass-bg-dark);
+    border: 1px solid var(--glass-border-dark);
+  }
+}
+
+/* Glassmorphism for inputs */
+:deep(.el-input__wrapper) {
+  background: var(--glass-bg-light) !important;
+  backdrop-filter: blur(var(--blur-amount)) !important;
+  border: 1px solid var(--glass-border-light) !important;
+  border-radius: 15px !important;
+  box-shadow: none !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :deep(.el-input__wrapper) {
+    background: var(--glass-bg-dark) !important;
+    border: 1px solid var(--glass-border-dark) !important;
+  }
+}
+
+/* Tag styling */
+:deep(.el-tag) {
+  border-radius: 12px !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  :deep(.el-tag) {
+    border: 1px solid var(--glass-border-dark);
+  }
+}
+
+/* Tooltip styling */
+:deep(.el-popper) {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid var(--glass-border-light) !important;
+  border-radius: 15px !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :deep(.el-popper) {
+    background: rgba(30, 30, 30, 0.95) !important;
+    border: 1px solid var(--glass-border-dark) !important;
+  }
 }
 </style>

@@ -106,9 +106,7 @@
           </svg>
         </a>
       </div>
-      <el-button style="float: left;margin-top: -20px;margin-right: 3px" type="primary" :icon="Histogram" link
-        @click="showMark.show = true" />
-        <el-button style="float: left;margin-top: -20px;margin-left: 39px" type="primary" :icon="FullScreen" link
+      <el-button style="float: left;margin-top: -20px;margin-left: 3px" type="primary" :icon="FullScreen" link
         @click="isFullScreen = true" />
       <el-button style="float: right;margin-top: -20px;margin-right: 3px" type="primary" :icon="TrendCharts" link
         v-if="!chartShow" @click="chartShow = true" />
@@ -224,7 +222,6 @@
       </span>
     </template>
   </el-dialog>
-  <MarkUI :show="showMark" :loginInfo="loginInfo" />
   <audio v-if="isMobile && !isIOS && !isMiuiBrowser && runBackground" @canplay="() => { if (isRunning) audioDom.play() }"
     @pause="() => { if (runBackground) isRunning = false }" @play="isRunning = true" controls loop ref="audioDom"
     style="display:none">
@@ -247,13 +244,10 @@ const props = defineProps({
 })
 import { ElMessage } from 'element-plus'
 import nodesJson from "../assets/nodes.json"
-import { Link, Edit, Delete, CircleCheck, Loading, CopyDocument, TrendCharts, Hide, Histogram, Calendar,FullScreen } from '@element-plus/icons-vue'
+import { Link, Edit, Delete, CircleCheck, Loading, CopyDocument, TrendCharts, Hide, Calendar,FullScreen } from '@element-plus/icons-vue'
 import { ref, watch,watchEffect, type Ref, reactive } from 'vue'
 import { toClipboard } from '@soerenmartius/vue3-clipboard'
-import MarkUI from './Mark.vue'
 import FullScreenUI from './FullScreen.vue'
-
-const showMark = ref({ show: false })
 const customNodes = reactive(localStorage.customNodes ? JSON.parse(localStorage.customNodes) : [])
 const OnlineNodes: {
   label: string;
@@ -318,7 +312,6 @@ const state = reactive({
 })
 const isRunning = ref(false)
 const isFullScreen = ref(false)
-const loginInfo = reactive({ AccessToken: localStorage.AccessToken ? localStorage.AccessToken : "" })
 const chartShow = ref(localStorage.chartShow ? localStorage.chartShow === 'true' : false)
 const threadNum = ref(localStorage.threadNum ? Number(localStorage.threadNum) : 8)
 const runBackground = ref(localStorage.runBackground ? localStorage.runBackground === 'true' : false)
@@ -448,28 +441,6 @@ async function uploadLog() {
 
   state.logged = state.bytesUsed
   state.lastLogTime = now
-  // if (loginInfo.AccessToken) {
-    let resp = await fetch(import.meta.env.VITE_API_URL+"log", {
-      method: "POST",
-      mode: "cors",
-      redirect: "follow",
-      referrerPolicy: "no-referrer",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        AccessToken: loginInfo.AccessToken,
-        url: runUrl.value,
-        threadNum: threadNum.value,
-        used: num,
-        time: time
-      })
-    });
-    resp = await resp.json()
-    if (resp.status == -1) {
-      loginInfo.AccessToken = ''
-    }
-  // }
 }
 
 watch(props, async (newState, oldState) => {
@@ -501,10 +472,6 @@ watch(runUrl, async (newState, oldState) => {
   if (isRunning.value) {
     apiSolver()
   }
-})
-
-watch(loginInfo, async (newState, oldState) => {
-  localStorage.AccessToken = newState.AccessToken
 })
 
 watchEffect(() => {
@@ -753,6 +720,7 @@ const chartContainer = ref(null);
 let myChart: EChartsType;
 let updateChart = (n:number) => {};
 let clearChart=()=>{};
+
 onMounted(() => {
   myChart = echarts.init(chartContainer.value);
   const chartOption = {
@@ -763,6 +731,12 @@ onMounted(() => {
         return `${new Date(params[0].data[0] * 1000).toLocaleString()}<br />
               ${speed}`;
       },
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      backdropFilter: 'blur(10px)',
+      borderColor: 'rgba(102, 126, 234, 0.3)',
+      textStyle: {
+        color: '#2d3748'
+      }
     },
     toolbox: {
       feature: {
@@ -771,7 +745,11 @@ onMounted(() => {
     },
     title: {
       left: 'left',
-      text: '速度图表'
+      text: '速度图表',
+      textStyle: {
+        color: '#4a5568',
+        fontWeight: 600
+      }
     },
     xAxis: {
       type: 'time',
@@ -779,8 +757,16 @@ onMounted(() => {
       axisLabel: {
         show: false
       },
+      axisLine: {
+        lineStyle: {
+          color: 'rgba(102, 126, 234, 0.3)'
+        }
+      },
       axisTick:{
         show:false
+      },
+      splitLine: {
+        show: false
       }
     },
     yAxis: {
@@ -789,6 +775,17 @@ onMounted(() => {
         formatter: (val: number) => {
           let a = formatter(val, 1, [0, 0, 0, 0, 0, 0]);
           return a == '-' ? 0 : a
+        },
+        color: '#718096'
+      },
+      axisLine: {
+        lineStyle: {
+          color: 'rgba(102, 126, 234, 0.3)'
+        }
+      },
+      splitLine: {
+        lineStyle: {
+          color: 'rgba(102, 126, 234, 0.1)'
         }
       }
     },
@@ -796,9 +793,28 @@ onMounted(() => {
       {
         name: '速度',
         type: 'line',
-        smooth: false,
+        smooth: true,
         symbol: 'none',
-        areaStyle: {},
+        lineStyle: {
+          width: 3,
+          color: '#667eea'
+        },
+        areaStyle: {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [{
+              offset: 0,
+              color: 'rgba(102, 126, 234, 0.5)'
+            }, {
+              offset: 1,
+              color: 'rgba(118, 75, 162, 0.1)'
+            }]
+          }
+        },
         data: [[new Date().getTime() / 1000,0]]
       }
     ],
@@ -855,25 +871,41 @@ onUnmounted(() => {
 });
 </script>
 <style scoped>
+:root {
+  --glass-bg-light: rgba(255, 255, 255, 0.25);
+  --glass-bg-dark: rgba(30, 30, 30, 0.6);
+  --glass-border-light: rgba(255, 255, 255, 0.3);
+  --glass-border-dark: rgba(255, 255, 255, 0.1);
+  --blur-amount: 20px;
+}
+
 .ItemContainer {
   column-count: 3;
   margin-top: 10px;
 }
 
-.card{
+.card {
   max-width: 800px;
-  height:fit-content;
+  height: fit-content;
   display: block;
-  margin:0 auto;
-  background-color:#ffffff;
-  padding:2%
+  margin: 0 auto;
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(var(--blur-amount));
+  -webkit-backdrop-filter: blur(var(--blur-amount));
+  border: 1px solid var(--glass-border-light);
+  border-radius: 30px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  padding: 25px;
 }
 
 @media (prefers-color-scheme: dark) {
-    .card {
-        background-color:rgb(18,18,18);
-    }
+  .card {
+    background: var(--glass-bg-dark);
+    border: 1px solid var(--glass-border-dark);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
 }
+
 @media screen and (max-width: 800px) {
   .ItemContainer {
     column-count: 1;
@@ -881,8 +913,24 @@ onUnmounted(() => {
 }
 
 .showItem {
-  border: 1px solid #dbdfea !important;
-  padding: 20px 15px 15px 30px
+  border: 1px solid var(--glass-border-light) !important;
+  padding: 25px 20px 20px 30px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.showItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .showItem {
+    border: 1px solid var(--glass-border-dark) !important;
+    background: rgba(0, 0, 0, 0.2);
+  }
 }
 
 .font-data {
@@ -890,12 +938,23 @@ onUnmounted(() => {
   grid-column-start: 1;
   font-weight: 700;
   line-height: 2.5rem;
-  font-size: 30px;
+  font-size: 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.font-background{
-  color: #344357;
-  font-size: 14px;
+.font-background {
+  color: #4a5568;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+@media (prefers-color-scheme: dark) {
+  .font-background {
+    color: #e2e8f0;
+  }
 }
 
 .state-icon {
@@ -905,60 +964,136 @@ onUnmounted(() => {
   margin-top: -10px;
   width: 40px;
   height: 20px;
-  color: rgb(96,98,102);
+  color: rgb(96, 98, 102);
 }
 
-.state-icon-main{
-  color: rgb(9,194,222);
+.state-icon-main {
+  color: #667eea;
 }
 
-.svg-icon{
-  fill:rgb(255,255,255);
-  width: 50px;
+.svg-icon {
+  fill: rgb(255, 255, 255);
+  width: 55px;
   margin-left: 10px;
   margin-top: -30px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
 }
 
-.el-select-dropdown__wrap{
+.el-select-dropdown__wrap {
   max-height: 60vh;
 }
-.el-icon-loading{
+
+.el-icon-loading {
   margin-top: 40px;
-  color:rgb(255,255,255);
+  color: rgb(255, 255, 255);
 }
+
 @media (prefers-color-scheme: dark) {
-    .showItem {
-      border: 1px solid rgb(61,63,66) !important;
-    }
-    .state-icon{
-      color: rgb(165,167,172);
-    }
-    .state-icon-main{
-      color: rgb(30,105,131);
-    }
-    .font-background{
-        color: rgb(193,206,230);
-    }
-    .svg-icon{
-      fill:rgb(220,220,220);
-    }
+  .state-icon {
+    color: rgb(165, 167, 172);
+  }
+
+  .state-icon-main {
+    color: #a78bfa;
+  }
+
+  .svg-icon {
+    fill: rgb(220, 220, 220);
+  }
 }
 
-
-
+/* iOS-style button */
 .button {
   display: block;
   text-decoration: none;
-  background-color: #485bed;
-  background-image: -webkit-linear-gradient(145deg, #485bed, #6576ff);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   font-size: 30px;
   font-weight: 700 !important;
-  margin: 36px;
-  width: 144px;
-  height: 144px;
+  margin: 36px auto;
+  width: 160px;
+  height: 160px;
   position: relative;
   text-align: center;
-  line-height: 144px;
+  line-height: 160px;
   border-radius: 50%;
-  box-shadow: 0px 3px 8px #485bed, inset 0px 2px 3px #6576ff;
-}</style>
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.button:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+.button:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Glassmorphism for dialogs */
+:deep(.el-dialog) {
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(var(--blur-amount));
+  -webkit-backdrop-filter: blur(var(--blur-amount));
+  border: 1px solid var(--glass-border-light);
+  border-radius: 30px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  :deep(.el-dialog) {
+    background: var(--glass-bg-dark);
+    border: 1px solid var(--glass-border-dark);
+  }
+}
+
+/* Glassmorphism for inputs and selects */
+:deep(.el-select) {
+  background: var(--glass-bg-light) !important;
+  backdrop-filter: blur(var(--blur-amount)) !important;
+  border: 1px solid var(--glass-border-light) !important;
+  border-radius: 15px !important;
+}
+
+:deep(.el-input__wrapper) {
+  background: var(--glass-bg-light) !important;
+  backdrop-filter: blur(var(--blur-amount)) !important;
+  border: 1px solid var(--glass-border-light) !important;
+  border-radius: 15px !important;
+  box-shadow: none !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :deep(.el-select) {
+    background: var(--glass-bg-dark) !important;
+    border: 1px solid var(--glass-border-dark) !important;
+  }
+
+  :deep(.el-input__wrapper) {
+    background: var(--glass-bg-dark) !important;
+    border: 1px solid var(--glass-border-dark) !important;
+  }
+}
+
+/* Slider styling */
+:deep(.el-slider__runway) {
+  background: rgba(102, 126, 234, 0.2) !important;
+  border-radius: 10px !important;
+}
+
+:deep(.el-slider__bar) {
+  background: linear-gradient(90deg, #667eea, #764ba2) !important;
+  border-radius: 10px !important;
+}
+
+:deep(.el-slider__button) {
+  border: 3px solid #667eea !important;
+  background: #fff !important;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4) !important;
+}
+
+/* Switch styling */
+:deep(.el-switch.is-checked .el-switch__core) {
+  background: linear-gradient(90deg, #667eea, #764ba2) !important;
+}
+</style>

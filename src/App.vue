@@ -58,18 +58,18 @@
     </div>
     <div>
       <h2>更新日志</h2>
-	  <div>
+      <div>
         <h3>v3.2.2</h3>
         <p>
-		  修复数据上报问题<br>
+          修复数据上报问题<br>
         </p>
       </div>
-	  <div>
+      <div>
         <h3>v3.2.1</h3>
         <p>
           1.添加链接时可选“增强并发”开关(v2.7~v3.1此功能全局开启)<br>
-		  2.修复从通知栏退出后再打开总流量不清零问题<br>
-		  3.修复部分链接暂停之后再启动没有速度的问题<br>
+          2.修复从通知栏退出后再打开总流量不清零问题<br>
+          3.修复部分链接暂停之后再启动没有速度的问题<br>
         </p>
       </div>
       <div>
@@ -234,83 +234,199 @@ document.addEventListener("visibilitychange", function () {
 })
 </script>
 
-<style scoped>  
+<style>
+:root {
+  --glass-bg-light: rgba(255, 255, 255, 0.25);
+  --glass-bg-dark: rgba(30, 30, 30, 0.6);
+  --glass-border-light: rgba(255, 255, 255, 0.3);
+  --glass-border-dark: rgba(255, 255, 255, 0.1);
+  --blur-amount: 20px;
+}
+
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  }
+}
+</style>
+
+<style scoped>
+
 .question {
   margin-top: 10px;
 }
+
 .ask {
   color: #6071ee;
 }
+
 .header {
   height: fit-content;
-  padding-bottom: 12px;
-  background-color: #ffffff;
+  padding: 20px;
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(var(--blur-amount));
+  -webkit-backdrop-filter: blur(var(--blur-amount));
+  border-bottom: 1px solid var(--glass-border-light);
+  border-radius: 0 0 30px 30px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
 }
 
 .title {
-  color: #526484;
-  font-size: 20px;
-  font-weight: bolder;
+  color: #2d3748;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .home {
-  color: #526484;
-  font-size: 12px;
+  color: #4a5568;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
-.icon {
-  display:inline-block;
-  vertical-align: -6px;
-  width: 40px;
-  height: 40px;
-  background-color: #5668EE;
-  border-radius: 20%;
-}
-.icon svg {
-  width: 30px;
-  margin-left: 5px;
-}
-.card{
-    max-width: 800px;
-    height:fit-content;
-    display: block;
-    margin:0 auto;
-    background-color:#ffffff;
-    padding:2%;
-    border-radius: 20px;
-}
-.banner{
-  margin-top: 15px;
-}
-.banner > img {
-  height: 70px;
-  width: calc(100% - 20px);
-  margin: 10px;
-  border-radius: 20px;
-}
-.banner > span{
-  position: relative;
-  display: block;
-  left: 15px;
-  top: 10px;
-  color: transparent;
-  font-weight: bolder;
-  background-clip: text;
-  background-image: linear-gradient(to right,#37CAC6, #3D95F4 80px);
 
+.home:hover {
+  transform: translateY(-2px);
 }
+
+.icon {
+  display: inline-block;
+  vertical-align: -6px;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transition: transform 0.3s ease;
+}
+
+.icon:hover {
+  transform: scale(1.05);
+}
+
+.icon svg {
+  width: 28px;
+  margin-left: 8px;
+  margin-top: 7px;
+}
+
+.card {
+  max-width: 800px;
+  height: fit-content;
+  display: block;
+  margin: 0 auto;
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(var(--blur-amount));
+  -webkit-backdrop-filter: blur(var(--blur-amount));
+  border: 1px solid var(--glass-border-light);
+  border-radius: 30px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
+
 @media (prefers-color-scheme: dark) {
   .card {
-        background-color:rgb(18,18,18);
-    }
+    background: var(--glass-bg-dark);
+    border: 1px solid var(--glass-border-dark);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+
   .header {
-    background-color: rgb(18, 18, 18);
+    background: var(--glass-bg-dark);
+    border-bottom: 1px solid var(--glass-border-dark);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
   }
 
   .title {
-    color: rgb(152, 167, 202);
+    color: #e2e8f0;
   }
 
   .home {
-    color: rgb(152, 167, 202);
+    color: #a0aec0;
   }
-}</style>
+}
+
+/* Glassmorphism for dialogs */
+:deep(.el-dialog) {
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(var(--blur-amount));
+  -webkit-backdrop-filter: blur(var(--blur-amount));
+  border: 1px solid var(--glass-border-light);
+  border-radius: 30px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  :deep(.el-dialog) {
+    background: var(--glass-bg-dark);
+    border: 1px solid var(--glass-border-dark);
+  }
+}
+
+/* Glassmorphism buttons */
+:deep(.el-button--home) {
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(var(--blur-amount));
+  border: 1px solid var(--glass-border-light);
+  color: #4a5568;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-button--home:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.el-button--home:active) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :deep(.el-button--home) {
+    background: var(--glass-bg-dark);
+    border: 1px solid var(--glass-border-dark);
+    color: #a0aec0;
+  }
+}
+
+/* Global link styling */
+:deep(.el-link) {
+  transition: all 0.3s ease;
+}
+
+:deep(.el-link:hover) {
+  transform: translateY(-2px);
+}
+
+/* Global button styling */
+:deep(.el-button) {
+  border-radius: 20px !important;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-button--primary) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+}
+
+:deep(.el-button--primary:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+:deep(.el-button--primary:active) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+  :deep(.el-button--primary) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+}
+</style>

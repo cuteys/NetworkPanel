@@ -86,82 +86,116 @@ onUnmounted(()=>{
 })
 </script>
 <style scoped>
-@font-face {
-	font-family: 'DingTalk';
-	src: url('../assets/DingTalk-simple.ttf') format('truetype');
+:root {
+ --glass-bg-light: rgba(255, 255, 255, 0.15);
+ --glass-bg-dark: rgba(30, 30, 30, 0.4);
+ --glass-border-light: rgba(255, 255, 255, 0.2);
+ --glass-border-dark: rgba(255, 255, 255, 0.1);
+ --blur-amount: 20px;
 }
-.fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgb(0, 0, 0);
-    color: rgb(255, 255, 255);
-    z-index: 9999999999;
-    text-align: center;
-}
-.title {
-    margin-top: 3vh;
-    font-size: 30px;
-}
-.right {
-    margin-top: 20px;
-}
-@media screen and (min-width: 500px) {
-    .content{
-        column-count: 2;
-    }
-    .left {
-        height: 200px;
 
-    }
-    .right {
-        margin-top: -1vh;
-        height: 200px;
-    }
+@font-face {
+   font-family: 'DingTalk';
+   src: url('../assets/DingTalk-simple.ttf') format('truetype');
+}
+
+.fullscreen {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+   color: rgb(255, 255, 255);
+   z-index: 9999999999;
+   text-align: center;
+}
+
+.title {
+   margin-top: 3vh;
+   font-size: 32px;
+   font-weight: 700;
+   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.right {
+   margin-top: 20px;
+}
+
+@media screen and (min-width: 500px) {
+   .content{
+       column-count: 2;
+   }
+   .left {
+       height: 200px;
+
+   }
+   .right {
+       margin-top: -1vh;
+       height: 200px;
+   }
 }
 
 .date {
-    margin-top: -5px;
-    font-size: 20px;
+   margin-top: -5px;
+   font-size: 22px;
+   opacity: 0.9;
 }
+
 .time {
-    font-size: 60px;
+   font-size: 70px;
+   font-weight: 700;
+   text-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
 }
+
 .state > .des {
-    font-size: 15px;
-    font-weight: 900;
+   font-size: 16px;
+   font-weight: 600;
+   opacity: 0.8;
+   margin-bottom: 5px;
 }
+
 .state > .value {
-    font-size: 20px;
+   font-size: 28px;
+   font-weight: 700;
+   color: #a78bfa;
+   text-shadow: 0 2px 10px rgba(167, 139, 250, 0.4);
 }
+
 .content{
-    position: absolute; 
-    width: 99%;
-    max-width: 600px;
-    left: 50%;
-    top:50%;
-    transform: translate(-50%, -50%);
-    animation:standby 60s infinite alternate ease-in-out;
-    font-family: DingTalk;
+   position: absolute;
+   width: 99%;
+   max-width: 600px;
+   left: 50%;
+   top:50%;
+   transform: translate(-50%, -50%);
+   animation:standby 60s infinite alternate ease-in-out;
+   font-family: DingTalk;
+   background: var(--glass-bg-dark);
+   backdrop-filter: blur(var(--blur-amount));
+   -webkit-backdrop-filter: blur(var(--blur-amount));
+   border: 1px solid var(--glass-border-dark);
+   border-radius: 30px;
+   padding: 30px;
+   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
+
 @keyframes standby {
-    0% {
-        top: 50%;
-        left: 50%;
-    }
-    49% {
-        top: 50%;
-        left: 50%;
-    }
-    51% {
-        top: 55%;
-        left: 51%;
-    }
-    100% {
-        top: 55%;
-        left: 51%;
-    }
+   0% {
+       top: 50%;
+       left: 50%;
+   }
+   49% {
+       top: 50%;
+       left: 50%;
+   }
+   51% {
+       top: 55%;
+       left: 51%;
+   }
+   100% {
+       top: 55%;
+       left: 51%;
+   }
 }
 </style>
