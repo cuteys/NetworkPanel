@@ -151,7 +151,7 @@
     </template>
   </el-dialog>
 
-  <FullScreenUI v-if="isFullScreen" :isVisible="isFullScreen" :state="state" :isRunning="isRunning" @close="isFullScreen = false" />
+  <FullScreenUI v-model="isFullScreen" :state="state" :isRunning="isRunning" />
 </template>
 
 <script setup lang="ts">
