@@ -1,5 +1,5 @@
 <template>
-    <div class="radius card" :style="{ borderRadius: `var(--el-border-radius-round)` }">
+    <div class="radius card glass" :style="{ borderRadius: `var(--radius-lg)` }">
         <div style="text-align: center;">
             <transition name="el-fade-in">
                 <div v-if="ipInfo.local && ipInfo.local.country && ipInfo.local.country.code == 'CN'">
@@ -205,8 +205,9 @@ watchCloudflare("cp.cloudflare.com")
 
 <style scoped>
 .font-background {
-    color: #344357;
+    color: var(--text-color);
     font-size: 14px;
+    font-weight: 500;
 }
 
 .card {
@@ -214,27 +215,28 @@ watchCloudflare("cp.cloudflare.com")
     height: fit-content;
     display: block;
     margin: 0 auto;
-    background-color: #ffffff;
-    padding: 2%
+    padding: 20px;
 }
 
 .ip-table {
-    height: 100%;
+    width: 100%;
     margin: 20px auto;
-    padding: 10px;
-    border: #ffffff 1px solid;
-    border-radius: 10px;
-
+    padding: 15px;
+    border-radius: var(--radius-lg);
     text-align: center;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+
+.ip-table td {
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
 }
 
 @media (prefers-color-scheme: dark) {
-    .card {
-        background-color: rgb(18, 18, 18);
-    }
-
-    .font-background {
-        color: rgb(193, 206, 230);
+    .ip-table td {
+        background: rgba(255, 255, 255, 0.05);
     }
 }
 </style>

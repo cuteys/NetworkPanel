@@ -1,5 +1,5 @@
 <template>
-  <div class="radius card" :style="{ borderRadius: 'var(--el-border-radius-round)' }">
+  <div class="radius card glass" :style="{ borderRadius: 'var(--radius-lg)' }">
     <div style="margin-top: 10px;margin-left: 10px;margin-right: 10px;">
       <div class="slider-demo-block">
         <span class="font-background">测速地址：</span>
@@ -106,8 +106,7 @@
           </svg>
         </a>
       </div>
-      <el-button style="float: left;margin-top: -20px;margin-right: 3px" type="primary" :icon="Histogram" link
-        @click="showMark.show = true" />
+
         <el-button style="float: left;margin-top: -20px;margin-left: 39px" type="primary" :icon="FullScreen" link
         @click="isFullScreen = true" />
       <el-button style="float: right;margin-top: -20px;margin-right: 3px" type="primary" :icon="TrendCharts" link
@@ -224,7 +223,7 @@
       </span>
     </template>
   </el-dialog>
-  <MarkUI :show="showMark" :loginInfo="loginInfo" />
+  
   <audio v-if="isMobile && !isIOS && !isMiuiBrowser && runBackground" @canplay="() => { if (isRunning) audioDom.play() }"
     @pause="() => { if (runBackground) isRunning = false }" @play="isRunning = true" controls loop ref="audioDom"
     style="display:none">
@@ -250,10 +249,8 @@ import nodesJson from "../assets/nodes.json"
 import { Link, Edit, Delete, CircleCheck, Loading, CopyDocument, TrendCharts, Hide, Histogram, Calendar,FullScreen } from '@element-plus/icons-vue'
 import { ref, watch,watchEffect, type Ref, reactive } from 'vue'
 import { toClipboard } from '@soerenmartius/vue3-clipboard'
-import MarkUI from './Mark.vue'
 import FullScreenUI from './FullScreen.vue'
 
-const showMark = ref({ show: false })
 const customNodes = reactive(localStorage.customNodes ? JSON.parse(localStorage.customNodes) : [])
 const OnlineNodes: {
   label: string;
@@ -859,20 +856,12 @@ onUnmounted(() => {
   column-count: 3;
   margin-top: 10px;
 }
-
-.card{
+.card {
   max-width: 800px;
-  height:fit-content;
+  height: fit-content;
   display: block;
-  margin:0 auto;
-  background-color:#ffffff;
-  padding:2%
-}
-
-@media (prefers-color-scheme: dark) {
-    .card {
-        background-color:rgb(18,18,18);
-    }
+  margin: 0 auto;
+  padding: 20px;
 }
 @media screen and (max-width: 800px) {
   .ItemContainer {
@@ -893,11 +882,11 @@ onUnmounted(() => {
   font-size: 30px;
 }
 
-.font-background{
-  color: #344357;
+.font-background {
+  color: var(--text-color);
   font-size: 14px;
+  font-weight: 500;
 }
-
 .state-icon {
   display: block;
   margin-right: 10px;
