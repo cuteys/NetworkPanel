@@ -1,75 +1,89 @@
 <template>
-    <div class="radius card" :style="{ borderRadius: `var(--el-border-radius-round)` }">
-        <div style="text-align: center;">
+    <div class="ip-container">
+        <div class="ip-cards">
             <transition name="el-fade-in">
-                <div v-if="ipInfo.local && ipInfo.local.country && ipInfo.local.country.code == 'CN'">
-                    <el-tooltip class="item" effect="dark" :content="ipInfo.local.ip" placement="top">
-                        <div @click.stop="onQuery(ipInfo.local.ip)">
-                            <el-tag style="width: 50px;" class="ml-2" type="success">{{
-                                ipInfo.layLocal?ipInfo.layLocal+"ms":"-ms" }}</el-tag>
-                            <el-text style="cursor: pointer;margin-left: 5px;white-space:nowrap;vertical-align: -1px;"
-                                class="font-background">{{ ipInfo.local.show.join(" ") }}</el-text>
-                        </div>
-                    </el-tooltip>
+                <div v-if="ipInfo.local && ipInfo.local.country && ipInfo.local.country.code == 'CN'" class="ip-card">
+                    <div class="ip-card-header">
+                        <span class="ip-label">本地 IP</span>
+                        <el-tag class="ip-tag">{{ ipInfo.layLocal ? ipInfo.layLocal + "ms" : "-ms" }}</el-tag>
+                    </div>
+                    <div class="ip-info" @click.stop="onQuery(ipInfo.local.ip)">
+                        <div class="ip-address">{{ ipInfo.local.ip }}</div>
+                        <div class="ip-details">{{ ipInfo.local.show.join(" / ") }}</div>
+                    </div>
                 </div>
             </transition>
+
             <transition name="el-fade-in">
-                <div v-if="ipInfo.cloudflare && ipInfo.cloudflare.country && ipInfo.cloudflare.country.code != 'CN'">
-                    <el-tooltip class="item" effect="dark" :content="ipInfo.cloudflare.ip" placement="top">
-                        <div @click.stop="onQuery(ipInfo.cloudflare.ip)">
-                            <el-tag style="width: 50px;" class="ml-2" type="success">{{
-                                ipInfo.layCloudflare?ipInfo.layCloudflare+"ms":"-ms" }}</el-tag>
-                            <el-text style="cursor: pointer;margin-left: 5px;white-space:nowrap;vertical-align: -1px;"
-                                class="font-background">{{ ipInfo.cloudflare.show.join(" ") }}</el-text>
-                        </div>
-                    </el-tooltip>
+                <div v-if="ipInfo.cloudflare && ipInfo.cloudflare.country && ipInfo.cloudflare.country.code != 'CN'" class="ip-card">
+                    <div class="ip-card-header">
+                        <span class="ip-label">Cloudflare IP</span>
+                        <el-tag class="ip-tag">{{ ipInfo.layCloudflare ? ipInfo.layCloudflare + "ms" : "-ms" }}</el-tag>
+                    </div>
+                    <div class="ip-info" @click.stop="onQuery(ipInfo.cloudflare.ip)">
+                        <div class="ip-address">{{ ipInfo.cloudflare.ip }}</div>
+                        <div class="ip-details">{{ ipInfo.cloudflare.show.join(" / ") }}</div>
+                    </div>
                 </div>
             </transition>
+
             <transition name="el-fade-in">
-                <div v-if="!ipInfo.local && !ipInfo.cloudflare" v-loading="true">
-                    <el-tooltip class="item" effect="dark" content="" placement="top">
-                        <div>
-                            <el-text style="cursor: pointer;margin-left: 5px;white-space:nowrap;vertical-align: -1px;"
-                                class="font-background">正在加载...</el-text>
-                        </div>
-                    </el-tooltip>
+                <div v-if="!ipInfo.local && !ipInfo.cloudflare" class="ip-card loading-card">
+                    <el-skeleton :rows="3" animated />
                 </div>
-            </transition> 
+            </transition>
         </div>
     </div>
-    <el-dialog align-center style="width: 95vw;max-width: 600px;max-height: 85vh;" v-model="queryWindow" title="IP查询">
-        <el-input v-model="ipInput" style="max-width: 600px" placeholder="请输入IPV4/IPV6地址" clearable autocomplete="new-password">
-            <template #append><el-button type="primary" :icon="Search" circle  @click="onQuery(ipInput)"/></template>
-        </el-input>
-         <table class="ip-table" v-loading="isQuerying">
-            <tr>
-                <td @click="copy(ipRet.ip)">{{ ipRet.ip }}</td>
-            </tr>
-            <tr>
-                <td>{{ ipRet.addr }}</td>
-            </tr>
-            <tr v-if="ipRet.as?.info || ipRet.type">
-                <td>{{ ipRet.as?.info }} {{ ipRet.type }}</td>
-            </tr>
-            <tr v-if="ipRet.as">
-                <td>
-                    ASN {{ ipRet.as?.number }}
-                </td>
-            </tr>
-            <tr v-if="ipRet.country">
-                <td>
-                    {{ ipRet.country?.name }}({{ ipRet.country?.code }}) {{ ipRet.regions?.join(" ") }}
-                </td>
-            </tr>
-            <tr v-if="ipRet.registered_country?.code != ipRet.country?.code">
-                <td>
-                    注册地 {{ ipRet.registered_country?.name }}({{ ipRet.registered_country?.code }})
-                </td>
-            </tr>
-            <tr>
-                <td>{{ ipRet.as?.name }}</td>
-            </tr>
-         </table>
+
+    <el-dialog align-center style="width: 95vw; max-width: 600px; max-height: 85vh;" v-model="queryWindow" title="IP查询">
+        <div class="query-container">
+            <div class="query-input-wrapper">
+                <el-input v-model="ipInput" placeholder="请输入IPV4/IPV6地址" clearable autocomplete="new-password">
+                    <template #append>
+                        <el-button type="primary" @click="onQuery(ipInput)" :icon="Search" circle />
+                    </template>
+                </el-input>
+            </div>
+
+            <div v-loading="isQuerying" class="ip-result-container">
+                <div class="ip-result-card">
+                    <div class="result-item">
+                        <span class="result-label">IP 地址</span>
+                        <span class="result-value clickable" @click="copy(ipRet.ip)">{{ ipRet.ip }}</span>
+                    </div>
+
+                    <div class="result-item">
+                        <span class="result-label">地址</span>
+                        <span class="result-value">{{ ipRet.addr }}</span>
+                    </div>
+
+                    <div v-if="ipRet.as?.info || ipRet.type" class="result-item">
+                        <span class="result-label">类型</span>
+                        <span class="result-value">{{ ipRet.as?.info }} {{ ipRet.type }}</span>
+                    </div>
+
+                    <div v-if="ipRet.as" class="result-item">
+                        <span class="result-label">ASN</span>
+                        <span class="result-value">{{ ipRet.as?.number }}</span>
+                    </div>
+
+                    <div v-if="ipRet.country" class="result-item">
+                        <span class="result-label">国家/地区</span>
+                        <span class="result-value">{{ ipRet.country?.name }}({{ ipRet.country?.code }}) {{ ipRet.regions?.join(" ") }}</span>
+                    </div>
+
+                    <div v-if="ipRet.registered_country?.code != ipRet.country?.code" class="result-item">
+                        <span class="result-label">注册地</span>
+                        <span class="result-value">{{ ipRet.registered_country?.name }}({{ ipRet.registered_country?.code }})</span>
+                    </div>
+
+                    <div class="result-item">
+                        <span class="result-label">运营商</span>
+                        <span class="result-value">{{ ipRet.as?.name }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </el-dialog>
 </template>
 
@@ -77,14 +91,16 @@
 const props = defineProps({
     isVisible: Boolean
 })
-import { reactive,ref, type Ref } from 'vue'
+import { reactive, ref, type Ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { toClipboard } from '@soerenmartius/vue3-clipboard'
 import { Search } from '@element-plus/icons-vue'
+
 const queryWindow = ref(false)
 const isQuerying = ref(false)
 const ipInput = ref("")
 const ipRet: Ref<any> = ref({})
+
 const onQuery = async(ip:string) => {
     queryWindow.value = true
     try {
@@ -101,12 +117,14 @@ const onQuery = async(ip:string) => {
         ElMessage.error(String(error))
     }
 }
+
 const ipInfo: {local:any, cloudflare:any,layLocal:any,layCloudflare:any} = reactive({local:null, cloudflare:null,layLocal:null,layCloudflare:null})
+
 const copy = (ip: string) => {
     toClipboard(ip)
     ElMessage.success({
         dangerouslyUseHTMLString: true,
-        message: `已经复制IP地址：<br><strong>${ip}</strong>`,
+        message: `已复制IP地址：<br><strong>${ip}</strong>`,
     })
 }
 
@@ -186,7 +204,6 @@ const watchCloudflare = async(host: string) => {
 }
 
 watchCloudflare("cp.cloudflare.com")
-// watchCloudflare("chat.openai.com")
 
 ;(async function getCNLay() {
     if (props.isVisible) {
@@ -204,37 +221,266 @@ watchCloudflare("cp.cloudflare.com")
 </script>
 
 <style scoped>
-.font-background {
-    color: #344357;
-    font-size: 14px;
+.ip-container {
+    width: 100%;
 }
 
-.card {
-    max-width: 800px;
-    height: fit-content;
-    display: block;
-    margin: 0 auto;
-    background-color: #ffffff;
-    padding: 2%
+.ip-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
 }
 
-.ip-table {
-    height: 100%;
-    margin: 20px auto;
-    padding: 10px;
-    border: #ffffff 1px solid;
-    border-radius: 10px;
+@media (max-width: 768px) {
+    .ip-cards {
+        grid-template-columns: 1fr;
+    }
+}
 
-    text-align: center;
+.ip-card {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.ip-card:hover {
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
 }
 
 @media (prefers-color-scheme: dark) {
-    .card {
-        background-color: rgb(18, 18, 18);
+    .ip-card {
+        background: rgba(26, 26, 46, 0.6);
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
 
-    .font-background {
-        color: rgb(193, 206, 230);
+    .ip-card:hover {
+        background: rgba(26, 26, 46, 0.7);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+}
+
+.loading-card {
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ip-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 12px;
+}
+
+.ip-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+@media (prefers-color-scheme: dark) {
+    .ip-label {
+        color: #e2e8f0;
+    }
+}
+
+.ip-tag {
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.ip-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ip-address {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    word-break: break-all;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+    .ip-address {
+        color: #e2e8f0;
+    }
+}
+
+.ip-details {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+    .ip-details {
+        color: #a0aec0;
+    }
+}
+
+/* 查询对话框 */
+.query-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.query-input-wrapper {
+    width: 100%;
+}
+
+:deep(.query-input-wrapper .el-input__wrapper) {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+    :deep(.query-input-wrapper .el-input__wrapper) {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+.ip-result-container {
+    min-height: 200px;
+}
+
+.ip-result-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+    .ip-result-card {
+        background: rgba(255, 255, 255, 0.02);
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+}
+
+.result-item {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 16px;
+    align-items: start;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.result-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+    .result-item {
+        border-bottom-color: rgba(255, 255, 255, 0.05);
+    }
+}
+
+.result-label {
+    font-size: 12px;
+    color: #999;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+@media (prefers-color-scheme: dark) {
+    .result-label {
+        color: #718096;
+    }
+}
+
+.result-value {
+    font-size: 14px;
+    color: #333;
+    word-break: break-word;
+    line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+    .result-value {
+        color: #e2e8f0;
+    }
+}
+
+.result-value.clickable {
+    cursor: pointer;
+    color: #667eea;
+    transition: all 0.2s ease;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.result-value.clickable:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+@media (prefers-color-scheme: dark) {
+    .result-value.clickable {
+        color: #a0aec0;
+    }
+}
+
+@media (max-width: 480px) {
+    .ip-card {
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .ip-card-header {
+        margin-bottom: 12px;
+    }
+
+    .ip-label {
+        font-size: 13px;
+    }
+
+    .ip-address {
+        font-size: 14px;
+    }
+
+    .ip-details {
+        font-size: 12px;
+    }
+
+    .result-item {
+        grid-template-columns: 70px 1fr;
+        gap: 12px;
+    }
+
+    .result-label {
+        font-size: 11px;
+    }
+
+    .result-value {
+        font-size: 13px;
     }
 }
 </style>

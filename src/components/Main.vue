@@ -1,241 +1,298 @@
 <template>
-  <div class="radius card" :style="{ borderRadius: 'var(--el-border-radius-round)' }">
-    <div style="margin-top: 10px;margin-left: 10px;margin-right: 10px;">
-      <div class="slider-demo-block">
-        <span class="font-background">测速地址：</span>
-        <el-button type="primary" :icon="CopyDocument" link @click="copyUrl" />
-        <el-button type="primary" :icon="Edit" link @click="EditTableVisible = true" />
-        <br>
-        <el-select style="width: 100%;" v-model="runUrl">
+  <div class="main-container">
+    <!-- 测速地址卡片 -->
+    <div class="ios-card">
+      <div class="card-header">
+        <span class="card-title">测速地址</span>
+        <div class="card-actions">
+          <button class="icon-btn" @click="copyUrl" title="复制链接">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+            </svg>
+          </button>
+          <button class="icon-btn" @click="EditTableVisible = true" title="编辑地址">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="ios-select-wrapper">
+        <el-select v-model="runUrl" class="ios-select">
           <el-option-group v-for="group in nodes" :key="group.label" :label="group.label">
             <el-option v-for="item in group.options" :key="item.value" :label="item.label" :value="item.value" />
           </el-option-group>
-          <template #prefix>
-            <el-icon>
-              <Link />
-            </el-icon>
-          </template>
         </el-select>
       </div>
-      <div style="margin-top:20px;">
-        <span class="font-background">线程数：{{ threadNum }}</span>
-        <el-slider :show-tooltip="false" :min="1" :max='64' v-model="threadNum" />
-      </div>
-      <div style="width: 100%;height:32px;">
-        <div style="float: left;">
-          <el-switch v-model="runBackground" active-text="保持后台运行" />
-        </div>
-        <div style="float: right;">
-          <el-switch v-model="autoStart" active-text="自动运行" />
-        </div>
-      </div>
-      <div class="ItemContainer">
-        <div class="showItem">
-          <span class="font-background" style="font-size: larger;">总流量</span>
-          <el-text size="small" class="mx-1">{{ state.maxUse ? '/' + formatter(state.maxUse, 0, [0, 0, 0, 0, 0, 0]) : ""
-          }}</el-text>
-          <el-button type="primary" style="height: 15px;" :icon="Edit" link @click="EditMaxVisible = true" />
-          <div class="state-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-              class="h-15 w-15 float-right pt-3">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
-            </svg>
-          </div>
-          <el-text class="font-data">{{ state.show.allUsed }}</el-text>
-        </div>
-        <div class="showItem">
-          <span class="font-background" style="font-size: larger;">{{ isRunning ? '实时速度' : '平均速度' }}</span>
-          <el-popover placement="top-start" title="用量预测" :width="150" trigger="click">
-            <template #reference>
-              <el-button type="primary" style="height: 15px;vertical-align: -2px;" :icon="Calendar" link />
-            </template>
-            每分钟&nbsp;&nbsp;{{ state.predict.min }}
-            <br>
-            每小时&nbsp;&nbsp;{{ state.predict.hour }}
-            <br>
-            每天&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ state.predict.day }}
-            <br>
-            每月&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ state.predict.mon }}
-          </el-popover>
-          <div class="state-icon state-icon-main">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-              class="h-15 w-15 float-right pt-3">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-                d="M16.469,8.924l-2.414,2.413c-0.156,0.156-0.408,0.156-0.564,0c-0.156-0.155-0.156-0.408,0-0.563l2.414-2.414c1.175-1.175,1.175-3.087,0-4.262c-0.57-0.569-1.326-0.883-2.132-0.883s-1.562,0.313-2.132,0.883L9.227,6.511c-1.175,1.175-1.175,3.087,0,4.263c0.288,0.288,0.624,0.511,0.997,0.662c0.204,0.083,0.303,0.315,0.22,0.52c-0.171,0.422-0.643,0.17-0.52,0.22c-0.473-0.191-0.898-0.474-1.262-0.838c-1.487-1.485-1.487-3.904,0-5.391l2.414-2.413c0.72-0.72,1.678-1.117,2.696-1.117s1.976,0.396,2.696,1.117C17.955,5.02,17.955,7.438,16.469,8.924 M10.076,7.825c-0.205-0.083-0.437,0.016-0.52,0.22c-0.083,0.205,0.016,0.437,0.22,0.52c0.374,0.151,0.709,0.374,0.997,0.662c1.176,1.176,1.176,3.088,0,4.263l-2.414,2.413c-0.569,0.569-1.326,0.883-2.131,0.883s-1.562-0.313-2.132-0.883c-1.175-1.175-1.175-3.087,0-4.262L6.51,9.227c0.156-0.155,0.156-0.408,0-0.564c-0.156-0.156-0.408-0.156-0.564,0l-2.414,2.414c-1.487,1.485-1.487,3.904,0,5.391c0.72,0.72,1.678,1.116,2.696,1.116s1.976-0.396,2.696-1.116l2.414-2.413c1.487-1.486,1.487-3.905,0-5.392C10.974,8.298,10.55,8.017,10.076,7.825">
-              </path>
-            </svg>
-          </div>
-          <el-text class="font-data state-icon-main">{{ state.show.speed }}</el-text>
-        </div>
-        <div class="showItem">
-          <span class="font-background" style="font-size: larger;">带宽</span>
-          <el-text size="small" class="mx-1">{{ state.maxSpeed ? '/' + formatter(state.maxSpeed, 2, [0, 0, 0, 0, 0, 0]) : ""
-          }}</el-text>
-          <el-button type="primary" style="height: 15px;" :icon="Edit" link @click="EditSpeedVisible = true" />
-          <div class="state-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-              class="h-15 w-15 float-right pt-3">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-            </svg>
-          </div>
-          <el-text class="font-data">{{ state.show.speedBit }}</el-text>
-        </div>
-      </div>
-
-      <div style="width: fit-content;display: block;margin-top:2ch;margin-left: auto;margin-right: auto;">
-        <a class="button" v-if="!isRunning && !state.isChecking" @click="tryStart">
-          <svg t="1694957757562" class="svg-icon"
-            viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4036" width="200" height="200">
-            <path
-              d="M823.8 603.5l-501.2 336c-50.7 34-119.3 20.4-153.2-30.2-12.2-18.2-18.7-39.6-18.7-61.5v-672c0-61 49.5-110.4 110.4-110.4 21.9 0 43.3 6.5 61.5 18.7l501.1 336c50.7 34 64.2 102.6 30.2 153.2-7.8 11.9-18.1 22.2-30.1 30.2z m0 0"
-              p-id="4037"></path>
-          </svg>
-        </a>
-        <a class="button" v-if="state.isChecking">
-          <el-icon :size="60" class="is-loading el-icon-loading">
-            <Loading />
-          </el-icon>
-        </a>
-        <a class="button" v-if="isRunning && !state.isChecking" @click="isRunning = false">
-          <svg t="1694958268344" fill="white" style="width: 80px;margin-top: -30px;" viewBox="0 0 1024 1024" version="1.1"
-            xmlns="http://www.w3.org/2000/svg" p-id="7667" width="200" height="200">
-            <path
-              d="M352 768c-17.664 0-32-14.304-32-32V288c0-17.664 14.336-32 32-32s32 14.336 32 32v448c0 17.696-14.336 32-32 32zM672 768c-17.696 0-32-14.304-32-32V288c0-17.664 14.304-32 32-32s32 14.336 32 32v448c0 17.696-14.304 32-32 32z"
-              p-id="7668"></path>
-          </svg>
-        </a>
-      </div>
-      <el-button style="float: left;margin-top: -20px;margin-right: 3px" type="primary" :icon="Histogram" link
-        @click="showMark.show = true" />
-        <el-button style="float: left;margin-top: -20px;margin-left: 39px" type="primary" :icon="FullScreen" link
-        @click="isFullScreen = true" />
-      <el-button style="float: right;margin-top: -20px;margin-right: 3px" type="primary" :icon="TrendCharts" link
-        v-if="!chartShow" @click="chartShow = true" />
-      <el-button style="float: right;margin-top: -20px;margin-right: 3px" type="primary" :icon="Hide" link
-        v-if="chartShow" @click="chartShow = false" />
-      <div v-show="chartShow" ref="chartContainer" style="width: 100%; height: 400px;"></div>
     </div>
-  </div>
 
-  <el-dialog style="width: 90%;max-width: 700px;" v-model="EditTableVisible" title="自定义地址">
-    <el-table v-if="customNodes.length" :data="customNodes" style="width: 100%" max-height="300">
-      <el-table-column prop="label" label="名称" width="100" />
-      <el-table-column prop="value" label="URL" />
-      <el-table-column fixed="right" label="" width="50">
-        <template #default="scope">
-          <el-button type="danger" link :icon="Delete" @click.prevent="customNodes.splice(scope.$index, 1)" />
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-empty v-else description="没有自定义地址" />
-    <el-button class="mt-4" style="width: 100%" @click="addTableVisible = true;">添加地址</el-button>
-  </el-dialog>
+    <!-- 线程数卡片 -->
+    <div class="ios-card">
+      <div class="card-header">
+        <span class="card-title">线程数</span>
+        <span class="card-value">{{ threadNum }}</span>
+      </div>
+      <div class="ios-slider-wrapper">
+        <el-slider :show-tooltip="false" :min="1" :max="64" v-model="threadNum" class="ios-slider" />
+      </div>
+    </div>
 
-  <el-dialog style="width: 90%;max-width: 700px;" v-model="addTableVisible" title="添加链接">
-    <el-form :model="addForm">
-      <el-form-item label="名称:" label-width='50px'>
-        <el-input v-model="addForm.label" autocomplete="off" />
-      </el-form-item>
-      <el-form-item label="url:" label-width='50px'>
-        <el-input v-model="addForm.value" autocomplete="off">
-          <template #suffix>
-            <el-icon v-if="urlParser(addForm.value)">
-              <CircleCheck />
+    <!-- 设置卡片 -->
+    <div class="ios-card">
+      <div class="settings-grid">
+        <div class="setting-item">
+          <span class="setting-label">保持后台运行</span>
+          <el-switch v-model="runBackground" class="ios-switch" />
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">自动运行</span>
+          <el-switch v-model="autoStart" class="ios-switch" />
+        </div>
+      </div>
+    </div>
+
+    <!-- 数据展示卡片 -->
+    <div class="ios-card">
+      <div class="data-grid">
+        <div class="data-item">
+          <div class="data-header">
+            <span class="data-label">总流量</span>
+            <span v-if="state.maxUse" class="data-limit">/ {{ formatter(state.maxUse, 0, [0, 0, 0, 0, 0, 0]) }}</span>
+            <button class="icon-btn-small" @click="EditMaxVisible = true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="data-value">{{ state.show.allUsed }}</div>
+        </div>
+
+        <div class="data-item">
+          <div class="data-header">
+            <span class="data-label">{{ isRunning ? '实时速度' : '平均速度' }}</span>
+            <el-popover placement="top-start" title="用量预测" :width="150" trigger="click">
+              <template #reference>
+                <button class="icon-btn-small">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </button>
+              </template>
+              <div class="predict-grid">
+                <div class="predict-item">
+                  <span class="predict-label">每分钟</span>
+                  <span class="predict-value">{{ state.predict.min }}</span>
+                </div>
+                <div class="predict-item">
+                  <span class="predict-label">每小时</span>
+                  <span class="predict-value">{{ state.predict.hour }}</span>
+                </div>
+                <div class="predict-item">
+                  <span class="predict-label">每天</span>
+                  <span class="predict-value">{{ state.predict.day }}</span>
+                </div>
+                <div class="predict-item">
+                  <span class="predict-label">每月</span>
+                  <span class="predict-value">{{ state.predict.mon }}</span>
+                </div>
+              </div>
+            </el-popover>
+          </div>
+          <div class="data-value speed-value">{{ state.show.speed }}</div>
+        </div>
+
+        <div class="data-item">
+          <div class="data-header">
+            <span class="data-label">带宽</span>
+            <span v-if="state.maxSpeed" class="data-limit">/ {{ formatter(state.maxSpeed, 2, [0, 0, 0, 0, 0, 0]) }}</span>
+            <button class="icon-btn-small" @click="EditSpeedVisible = true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="data-value">{{ state.show.speedBit }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 控制按钮卡片 -->
+    <div class="ios-card control-card">
+      <div class="control-buttons">
+        <button class="play-btn" v-if="!isRunning && !state.isChecking" @click="tryStart" :disabled="state.isChecking">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+        </button>
+        <button class="play-btn loading" v-if="state.isChecking">
+          <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+          </svg>
+        </button>
+        <button class="play-btn pause" v-if="isRunning && !state.isChecking" @click="isRunning = false">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="4" width="4" height="16"></rect>
+            <rect x="14" y="4" width="4" height="16"></rect>
+          </svg>
+        </button>
+
+        <div class="control-icons">
+          <button class="control-icon-btn" @click="showMark.show = true" title="标记">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"></path>
+              <path d="M12 7v5l3 2"></path>
+            </svg>
+          </button>
+          <button class="control-icon-btn" @click="isFullScreen = true" title="全屏">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+            </svg>
+          </button>
+          <button class="control-icon-btn" @click="chartShow = !chartShow" title="图表">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="12 3 20 7.5 20 16.5 12 21 4 16.5 4 7.5 12 3"></polyline>
+              <polyline points="12 12 20 7.5"></polyline>
+              <polyline points="12 12 12 21"></polyline>
+              <polyline points="12 12 4 7.5"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div v-show="chartShow" ref="chartContainer" class="chart-container"></div>
+    </div>
+
+    <!-- 对话框 -->
+    <el-dialog style="width: 90%; max-width: 700px;" v-model="EditTableVisible" title="自定义地址">
+      <el-table v-if="customNodes.length" :data="customNodes" style="width: 100%" max-height="300">
+        <el-table-column prop="label" label="名称" width="100" />
+        <el-table-column prop="value" label="URL" />
+        <el-table-column fixed="right" label="" width="50">
+          <template #default="scope">
+            <el-button type="danger" link @click.prevent="customNodes.splice(scope.$index, 1)" />
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-empty v-else description="没有自定义地址" />
+      <el-button class="mt-4" style="width: 100%" @click="addTableVisible = true;">添加地址</el-button>
+    </el-dialog>
+
+    <el-dialog style="width: 90%; max-width: 700px;" v-model="addTableVisible" title="添加链接">
+      <el-form :model="addForm">
+        <el-form-item label="名称:" label-width="50px">
+          <el-input v-model="addForm.label" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="url:" label-width="50px">
+          <el-input v-model="addForm.value" autocomplete="off">
+            <template #suffix>
+              <el-icon v-if="urlParser(addForm.value)">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
+                </svg>
+              </el-icon>
+            </template>
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <el-alert title="注意：" type="warning">
+        在浏览器工作的程序受到浏览器安全策略的限制
+        <br>
+        以下情况你将无法正常使用链接
+        <br>
+        1.你使用https协议打开的本站，但是url是http协议
+        <br>
+        2.目标服务器返回的Access-Control-Allow-Origin响应头没有允许本站
+        <br>
+        具体细节请在报错后查看控制台
+      </el-alert>
+      <el-alert title="免责声明：" type="error">
+        请勿用于非法用途，使用本功能造成的一切后果由用户承担
+      </el-alert>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="addTableVisible = false">取消</el-button>
+          <el-button type="primary" :disabled="!urlParser(addForm.value) || !addForm.label || addForm.checking"
+            @click="addNode()">确认
+            <el-icon v-if="addForm.checking" class="is-loading">
+              <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+              </svg>
             </el-icon>
-          </template>>
-        </el-input>
-      </el-form-item>
-    </el-form>
-    <el-alert title="注意：" type="warning">
-      在浏览器工作的程序受到浏览器安全策略的限制
-      <br>
-      以下情况你将无法正常使用链接
-      <br>
-      1.你使用https协议打开的本站，但是url是http协议
-      <br>
-      2.目标服务器返回的Access-Control-Allow-Origin响应头没有允许本站
-      <br>
-      具体细节请在报错后查看控制台
-    </el-alert>
-    <el-alert title="免责声明：" type="error">
-      请勿用于非法用途，使用本功能造成的一切后果由用户承担
-    </el-alert>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="addTableVisible = false">取消</el-button>
-        <el-button type="primary" :disabled="!urlParser(addForm.value) || !addForm.label || addForm.checking"
-          @click="addNode()">确认
-          <el-icon v-if="addForm.checking" class="is-loading">
-            <Loading />
-          </el-icon>
-        </el-button>
-      </span>
-    </template>
-  </el-dialog>
-  <el-dialog style="width: 90%;max-width: 300px;" v-model="EditMaxVisible" title="设置上限自动停止">
-    <el-form>
-      <div class="mt-4">
-        <el-input type="number" min='1' v-model="maxUseInput.num" autocomplete="off" placeholder="留空则无上限"
-          class="input-with-select">
-          <template #append>
-            <el-select v-model="maxUseInput.type" placeholder="Select" style="width: 65px">
-              <el-option label="MB" value="MB" />
-              <el-option label="GB" value="GB" />
-              <el-option label="TB" value="TB" />
-            </el-select>
-          </template>
-        </el-input>
-      </div>
-    </el-form>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="EditMaxVisible = false">取消</el-button>
-        <el-button type="primary" @click="editMaxUse()">
-          确定
-        </el-button>
-      </span>
-    </template>
-  </el-dialog>
-  <el-dialog style="width: 90%;max-width: 350px;" v-model="EditSpeedVisible" title="设置带宽上限">
-    <el-form>
-      <div class="mt-4">
-        <el-input type="number" min='1' v-model="maxSpeedInput.num" autocomplete="off" placeholder="留空则无上限"
-          class="input-with-select">
-          <template #append>
-            <el-select v-model="maxSpeedInput.type" placeholder="Select" style="width: 80px">
-              <el-option label="Mbps" value="Mbps" />
-              <el-option label="Gbps" value="Gbps" />
-            </el-select>
-          </template>
-        </el-input>
-        <br><br>
-        <el-alert title="注意：" type="warning">
-          浏览器会使用缓存策略<br>只能限制平均速度，无法限制峰值速度!<br>部分链接无法限速，请使用其它限速方法
-        </el-alert>
-      </div>
-    </el-form>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="EditSpeedVisible = false">取消</el-button>
-        <el-button type="primary" @click="editSpeedUse()">
-          确定
-        </el-button>
-      </span>
-    </template>
-  </el-dialog>
-  <MarkUI :show="showMark" :loginInfo="loginInfo" />
-  <audio v-if="isMobile && !isIOS && !isMiuiBrowser && runBackground" @canplay="() => { if (isRunning) audioDom.play() }"
-    @pause="() => { if (runBackground) isRunning = false }" @play="isRunning = true" controls loop ref="audioDom"
-    style="display:none">
-    <source :src="andoridSound" type="audio/mpeg">
-  </audio>
-  <audio v-if="isIOS && runBackground" @canplay="() => { if (isRunning) audioDom.play() }"
-    @pause="() => { if (runBackground) isRunning = false }" @play="isRunning = true" controls loop ref="audioDom"
-    style="display:none">
-    <source :src="iosSound" type="audio/mpeg">
-  </audio>
-  <FullScreenUI v-model="isFullScreen" :isRunning="isRunning" :state="state" />
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <el-dialog style="width: 90%; max-width: 300px;" v-model="EditMaxVisible" title="设置上限自动停止">
+      <el-form>
+        <div class="mt-4">
+          <el-input type="number" min="1" v-model="maxUseInput.num" autocomplete="off" placeholder="留空则无上限"
+            class="input-with-select">
+            <template #append>
+              <el-select v-model="maxUseInput.type" placeholder="Select" style="width: 65px">
+                <el-option label="MB" value="MB" />
+                <el-option label="GB" value="GB" />
+                <el-option label="TB" value="TB" />
+              </el-select>
+            </template>
+          </el-input>
+        </div>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="EditMaxVisible = false">取消</el-button>
+          <el-button type="primary" @click="editMaxUse()">
+            确定
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <el-dialog style="width: 90%; max-width: 350px;" v-model="EditSpeedVisible" title="设置带宽上限">
+      <el-form>
+        <div class="mt-4">
+          <el-input type="number" min="1" v-model="maxSpeedInput.num" autocomplete="off" placeholder="留空则无上限"
+            class="input-with-select">
+            <template #append>
+              <el-select v-model="maxSpeedInput.type" placeholder="Select" style="width: 80px">
+                <el-option label="Mbps" value="Mbps" />
+                <el-option label="Gbps" value="Gbps" />
+              </el-select>
+            </template>
+          </el-input>
+          <br><br>
+          <el-alert title="注意：" type="warning">
+            浏览器会使用缓存策略<br>只能限制平均速度，无法限制峰值速度!<br>部分链接无法限速，请使用其它限速方法
+          </el-alert>
+        </div>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="EditSpeedVisible = false">取消</el-button>
+          <el-button type="primary" @click="editSpeedUse()">
+            确定
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <MarkUI :show="showMark" :loginInfo="loginInfo" />
+    <audio v-if="isMobile && !isIOS && !isMiuiBrowser && runBackground" @canplay="() => { if (isRunning) audioDom.play() }"
+      @pause="() => { if (runBackground) isRunning = false }" @play="isRunning = true" controls loop ref="audioDom"
+      style="display:none">
+      <source :src="andoridSound" type="audio/mpeg">
+    </audio>
+    <audio v-if="isIOS && runBackground" @canplay="() => { if (isRunning) audioDom.play() }"
+      @pause="() => { if (runBackground) isRunning = false }" @play="isRunning = true" controls loop ref="audioDom"
+      style="display:none">
+      <source :src="iosSound" type="audio/mpeg">
+    </audio>
+    <FullScreenUI v-model="isFullScreen" :isRunning="isRunning" :state="state" />
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -247,8 +304,7 @@ const props = defineProps({
 })
 import { ElMessage } from 'element-plus'
 import nodesJson from "../assets/nodes.json"
-import { Link, Edit, Delete, CircleCheck, Loading, CopyDocument, TrendCharts, Hide, Histogram, Calendar,FullScreen } from '@element-plus/icons-vue'
-import { ref, watch,watchEffect, type Ref, reactive } from 'vue'
+import { ref, watch, watchEffect, type Ref, reactive } from 'vue'
 import { toClipboard } from '@soerenmartius/vue3-clipboard'
 import MarkUI from './Mark.vue'
 import FullScreenUI from './FullScreen.vue'
@@ -327,13 +383,10 @@ const runUrl = ref(localStorage.url ? localStorage.url : nodes.value[0].options[
 
 var tasks: Array<number> = []
 
+import { onMounted, onUnmounted } from 'vue';
+import * as echarts from 'echarts';
+
 onMounted(() => {
-  // setTimeout(() => {
-  //   ElMessage.warning({
-  //     dangerouslyUseHTMLString: true,
-  //     message: '本站将不再内置大厂链接 建议使用自定义节点功能',
-  //   })
-  // },500)
   autoStart.value&&tryStart();
 })
 
@@ -448,28 +501,26 @@ async function uploadLog() {
 
   state.logged = state.bytesUsed
   state.lastLogTime = now
-  // if (loginInfo.AccessToken) {
-    let resp = await fetch(import.meta.env.VITE_API_URL+"log", {
-      method: "POST",
-      mode: "cors",
-      redirect: "follow",
-      referrerPolicy: "no-referrer",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        AccessToken: loginInfo.AccessToken,
-        url: runUrl.value,
-        threadNum: threadNum.value,
-        used: num,
-        time: time
-      })
-    });
-    resp = await resp.json()
-    if (resp.status == -1) {
-      loginInfo.AccessToken = ''
-    }
-  // }
+  let resp = await fetch(import.meta.env.VITE_API_URL+"log", {
+    method: "POST",
+    mode: "cors",
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      AccessToken: loginInfo.AccessToken,
+      url: runUrl.value,
+      threadNum: threadNum.value,
+      used: num,
+      time: time
+    })
+  });
+  resp = await resp.json()
+  if (resp.status == -1) {
+    loginInfo.AccessToken = ''
+  }
 }
 
 watch(props, async (newState, oldState) => {
@@ -510,6 +561,7 @@ watch(loginInfo, async (newState, oldState) => {
 watchEffect(() => {
   localStorage.autoStart = autoStart.value;
 })
+
 const copyUrl = () => {
   toClipboard(runUrl.value).then(() => {
     ElMessage.success({
@@ -543,9 +595,10 @@ window.addEventListener("paste", function (e) {
     }
   }
 })
+
 var setTitle = (speed: number = 0) => {
   if (props.isVisible) {
-    document.title = '网络面板'
+    document.title = 'ChuiYan SpeedTest'
   } else {
     if (isRunning.value) {
       document.title = formatter(state.bytesUsed, 0, [0, 0, 0, 0, 0, 0]) + ' ' + formatter(speed, 1, [0, 0, 0, 0, 0, 0])
@@ -556,10 +609,12 @@ var setTitle = (speed: number = 0) => {
     }
   }
 }
+
 var setUsed = () => {
   if (!state.bytesUsed) state.show.allUsed = '-'
   state.show.allUsed = formatter(state.bytesUsed, 0, [0, 0, 1, 2, 2, 2])
 }
+
 var setSpeed = (speed: number) => {
   state.show.speed = formatter(speed, 1, [0, 0, 1, 2, 2, 2])
   state.show.speedBit = formatter(speed * 8, 2, [0, 0, 0, 2, 2, 2])
@@ -575,6 +630,7 @@ var frameEvent = () => {
     isRunning.value = false
   }
 }
+
 var secEvent = () => {
   var speed = (state.bytesUsed - state.recordUse) / (new Date().getTime() / 1000 - state.recordTime)
   if (!isNaN(speed)) updateChart(speed)
@@ -590,7 +646,6 @@ var secEvent = () => {
   state.recordUse = state.bytesUsed
   state.recordTime = new Date().getTime() / 1000;
 }
-
 
 function formatter(num: number, desIndex: number, flo: Array<number>) {
   const describeString = [['B', 'KB', 'MB', 'GB', 'TB', 'PB'],
@@ -666,10 +721,12 @@ const addForm = ref({
   value: '',
   checking: false
 })
+
 const urlParser = (ipt: string) => {
   var a = ipt.match(/https?:\/\/([\w-]+\.)+[\w-]+(:[0-9]+)?(\/\S*)?/);
   return a ? a[0] : '';
 }
+
 const addNode = async () => {
   addForm.value.value = urlParser(addForm.value.value)
   addForm.value.checking = true
@@ -699,6 +756,7 @@ const maxUseInput: Ref<{
   num: null,
   type: 'GB',
 })
+
 const editMaxUse = () => {
   var map = {
     "MB": 1024 * 1024,
@@ -738,21 +796,18 @@ const editSpeedUse = () => {
   maxSpeedInput.value.num = null
   EditSpeedVisible.value = false
 }
+
 var isMobile = /Mobi|Android|iPhone|Macintosh/i.test(navigator.userAgent)
 var isMiuiBrowser = /MiuiBrowser/i.test(navigator.userAgent)
 var isIOS = /iPhone|Macintosh/i.test(navigator.userAgent)
 
 const audioDom: Ref<any> = ref(null);
-
-
-import { onMounted, onUnmounted } from 'vue';
-import * as echarts from 'echarts';
-
 const chartContainer = ref(null);
 
 let myChart: EChartsType;
 let updateChart = (n:number) => {};
 let clearChart=()=>{};
+
 onMounted(() => {
   myChart = echarts.init(chartContainer.value);
   const chartOption = {
@@ -816,10 +871,8 @@ onMounted(() => {
   let speedTemp:Array<number>=[]
   let stepLength=1
   clearChart=()=>{
-    // showArray=[]
     speedTemp=[]
     showArray.push([new Date().getTime() / 1000,0])
-    // stepLength=1
   }
   updateChart = (speed:number) => {
     let refresh=false
@@ -854,111 +907,635 @@ onUnmounted(() => {
   }
 });
 </script>
+
 <style scoped>
-.ItemContainer {
-  column-count: 3;
-  margin-top: 10px;
+.main-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.card{
-  max-width: 800px;
-  height:fit-content;
-  display: block;
-  margin:0 auto;
-  background-color:#ffffff;
-  padding:2%
+/* iOS 卡片样式 */
+.ios-card {
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.ios-card:hover {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
 }
 
 @media (prefers-color-scheme: dark) {
-    .card {
-        background-color:rgb(18,18,18);
-    }
-}
-@media screen and (max-width: 800px) {
-  .ItemContainer {
-    column-count: 1;
+  .ios-card {
+    background: rgba(26, 26, 46, 0.6);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .ios-card:hover {
+    background: rgba(26, 26, 46, 0.7);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
   }
 }
 
-.showItem {
-  border: 1px solid #dbdfea !important;
-  padding: 20px 15px 15px 30px
+/* 卡片头部 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
-.font-data {
-  white-space: nowrap;
-  grid-column-start: 1;
-  font-weight: 700;
-  line-height: 2.5rem;
-  font-size: 30px;
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
 }
 
-.font-background{
-  color: #344357;
-  font-size: 14px;
-}
-
-.state-icon {
-  display: block;
-  margin-right: 10px;
-  margin-left: auto;
-  margin-top: -10px;
-  width: 40px;
-  height: 20px;
-  color: rgb(96,98,102);
-}
-
-.state-icon-main{
-  color: rgb(9,194,222);
-}
-
-.svg-icon{
-  fill:rgb(255,255,255);
-  width: 50px;
-  margin-left: 10px;
-  margin-top: -30px;
-}
-
-.el-select-dropdown__wrap{
-  max-height: 60vh;
-}
-.el-icon-loading{
-  margin-top: 40px;
-  color:rgb(255,255,255);
-}
 @media (prefers-color-scheme: dark) {
-    .showItem {
-      border: 1px solid rgb(61,63,66) !important;
-    }
-    .state-icon{
-      color: rgb(165,167,172);
-    }
-    .state-icon-main{
-      color: rgb(30,105,131);
-    }
-    .font-background{
-        color: rgb(193,206,230);
-    }
-    .svg-icon{
-      fill:rgb(220,220,220);
-    }
+  .card-title {
+    color: #e2e8f0;
+  }
 }
 
+.card-value {
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
 
-.button {
-  display: block;
-  text-decoration: none;
-  background-color: #485bed;
-  background-image: -webkit-linear-gradient(145deg, #485bed, #6576ff);
-  font-size: 30px;
-  font-weight: 700 !important;
-  margin: 36px;
-  width: 144px;
-  height: 144px;
-  position: relative;
-  text-align: center;
-  line-height: 144px;
+/* 图标按钮 */
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.icon-btn:hover {
+  background: rgba(102, 126, 234, 0.2);
+  transform: scale(1.05);
+}
+
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .icon-btn {
+    background: rgba(160, 174, 192, 0.1);
+    color: #a0aec0;
+  }
+
+  .icon-btn:hover {
+    background: rgba(160, 174, 192, 0.2);
+  }
+}
+
+.icon-btn-small {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #667eea;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.icon-btn-small:hover {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.icon-btn-small svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .icon-btn-small {
+    color: #a0aec0;
+  }
+
+  .icon-btn-small:hover {
+    background: rgba(160, 174, 192, 0.1);
+  }
+}
+
+/* iOS 选择框 */
+.ios-select-wrapper {
+  width: 100%;
+}
+
+.ios-select {
+  width: 100%;
+}
+
+:deep(.ios-select .el-input__wrapper) {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+:deep(.ios-select .el-input__wrapper:hover) {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :deep(.ios-select .el-input__wrapper) {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  :deep(.ios-select .el-input__wrapper:hover) {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* iOS 滑块 */
+.ios-slider-wrapper {
+  width: 100%;
+}
+
+:deep(.ios-slider .el-slider__bar) {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+:deep(.ios-slider .el-slider__button) {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  box-shadow: 0px 3px 8px #485bed, inset 0px 2px 3px #6576ff;
-}</style>
+  background: white;
+  border: 3px solid #667eea;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+:deep(.ios-slider .el-slider__track) {
+  background: rgba(102, 126, 234, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  :deep(.ios-slider .el-slider__button) {
+    background: #1a1a2e;
+    border-color: #a0aec0;
+  }
+
+  :deep(.ios-slider .el-slider__track) {
+    background: rgba(160, 174, 192, 0.2);
+  }
+}
+
+/* iOS 开关 */
+.ios-switch {
+  --el-switch-on-color: #667eea;
+  --el-switch-off-color: #ccc;
+}
+
+:deep(.ios-switch .el-switch__core) {
+  border-radius: 12px;
+  width: 50px;
+  height: 30px;
+}
+
+:deep(.ios-switch .el-switch__inner) {
+  font-size: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ios-switch {
+    --el-switch-off-color: #666;
+  }
+}
+
+/* 设置网格 */
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .setting-item {
+    background: rgba(255, 255, 255, 0.02);
+  }
+}
+
+.setting-label {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+@media (prefers-color-scheme: dark) {
+  .setting-label {
+    color: #e2e8f0;
+  }
+}
+
+@media (max-width: 640px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 数据网格 */
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .data-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.data-item {
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  .data-item {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.data-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.data-label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+@media (prefers-color-scheme: dark) {
+  .data-label {
+    color: #a0aec0;
+  }
+}
+
+.data-limit {
+  font-size: 12px;
+  color: #999;
+}
+
+@media (prefers-color-scheme: dark) {
+  .data-limit {
+    color: #718096;
+  }
+}
+
+.data-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  word-break: break-word;
+}
+
+@media (prefers-color-scheme: dark) {
+  .data-value {
+    color: #e2e8f0;
+  }
+}
+
+.speed-value {
+  color: #667eea;
+}
+
+/* 预测弹窗 */
+.predict-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.predict-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.predict-label {
+  font-size: 12px;
+  color: #666;
+}
+
+@media (prefers-color-scheme: dark) {
+  .predict-label {
+    color: #a0aec0;
+  }
+}
+
+.predict-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+@media (prefers-color-scheme: dark) {
+  .predict-value {
+    color: #e2e8f0;
+  }
+}
+
+/* 控制卡片 */
+.control-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.control-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+/* 播放按钮 */
+.play-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s ease;
+}
+
+.play-btn:hover:not(:disabled) {
+  transform: scale(1.1);
+  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.5);
+}
+
+.play-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.play-btn.pause {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  box-shadow: 0 8px 24px rgba(245, 87, 108, 0.4);
+}
+
+.play-btn.pause:hover {
+  box-shadow: 0 12px 32px rgba(245, 87, 108, 0.5);
+}
+
+.play-btn.loading {
+  background: linear-gradient(135deg, #ffa751 0%, #ffe259 100%);
+  box-shadow: 0 8px 24px rgba(255, 167, 81, 0.4);
+}
+
+.play-btn svg {
+  width: 40px;
+  height: 40px;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 控制图标按钮 */
+.control-icons {
+  display: flex;
+  gap: 12px;
+}
+
+.control-icon-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.control-icon-btn:hover {
+  background: rgba(102, 126, 234, 0.2);
+  transform: scale(1.05);
+}
+
+.control-icon-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .control-icon-btn {
+    background: rgba(160, 174, 192, 0.1);
+    color: #a0aec0;
+  }
+
+  .control-icon-btn:hover {
+    background: rgba(160, 174, 192, 0.2);
+  }
+}
+
+/* 图表容器 */
+.chart-container {
+  width: 100%;
+  height: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+@media (prefers-color-scheme: dark) {
+  .chart-container {
+    background: rgba(255, 255, 255, 0.02);
+  }
+}
+
+/* 对话框样式 */
+:deep(.el-dialog) {
+  border-radius: 20px !important;
+}
+
+:deep(.el-dialog__header) {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :deep(.el-dialog__header) {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+  }
+}
+
+:deep(.el-dialog__body) {
+  padding: 24px;
+}
+
+:deep(.el-input__wrapper) {
+  border-radius: 12px;
+}
+
+:deep(.el-button) {
+  border-radius: 12px;
+}
+
+:deep(.el-button--primary) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+}
+
+:deep(.el-button--primary:hover) {
+  opacity: 0.9;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .ios-card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .control-buttons {
+    gap: 16px;
+  }
+
+  .play-btn {
+    width: 72px;
+    height: 72px;
+    font-size: 28px;
+  }
+
+  .play-btn svg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .control-icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .data-value {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-container {
+    gap: 12px;
+  }
+
+  .ios-card {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .card-header {
+    margin-bottom: 12px;
+  }
+
+  .card-title {
+    font-size: 14px;
+  }
+
+  .data-grid {
+    gap: 12px;
+  }
+
+  .data-item {
+    padding: 12px;
+  }
+
+  .data-value {
+    font-size: 20px;
+  }
+
+  .play-btn {
+    width: 64px;
+    height: 64px;
+    font-size: 24px;
+  }
+
+  .play-btn svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .control-icon-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .control-icon-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+</style>
