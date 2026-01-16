@@ -1,242 +1,282 @@
 <template>
-    <div class="radius card glass" :style="{ borderRadius: `var(--radius-lg)` }">
-        <div style="text-align: center;">
-            <transition name="el-fade-in">
-                <div v-if="ipInfo.local && ipInfo.local.country && ipInfo.local.country.code == 'CN'">
-                    <el-tooltip class="item" effect="dark" :content="ipInfo.local.ip" placement="top">
-                        <div @click.stop="onQuery(ipInfo.local.ip)">
-                            <el-tag style="width: 50px;" class="ml-2" type="success">{{
-                                ipInfo.layLocal?ipInfo.layLocal+"ms":"-ms" }}</el-tag>
-                            <el-text style="cursor: pointer;margin-left: 5px;white-space:nowrap;vertical-align: -1px;"
-                                class="font-background">{{ ipInfo.local.show.join(" ") }}</el-text>
-                        </div>
-                    </el-tooltip>
-                </div>
-            </transition>
-            <transition name="el-fade-in">
-                <div v-if="ipInfo.cloudflare && ipInfo.cloudflare.country && ipInfo.cloudflare.country.code != 'CN'">
-                    <el-tooltip class="item" effect="dark" :content="ipInfo.cloudflare.ip" placement="top">
-                        <div @click.stop="onQuery(ipInfo.cloudflare.ip)">
-                            <el-tag style="width: 50px;" class="ml-2" type="success">{{
-                                ipInfo.layCloudflare?ipInfo.layCloudflare+"ms":"-ms" }}</el-tag>
-                            <el-text style="cursor: pointer;margin-left: 5px;white-space:nowrap;vertical-align: -1px;"
-                                class="font-background">{{ ipInfo.cloudflare.show.join(" ") }}</el-text>
-                        </div>
-                    </el-tooltip>
-                </div>
-            </transition>
-            <transition name="el-fade-in">
-                <div v-if="!ipInfo.local && !ipInfo.cloudflare" v-loading="true">
-                    <el-tooltip class="item" effect="dark" content="" placement="top">
-                        <div>
-                            <el-text style="cursor: pointer;margin-left: 5px;white-space:nowrap;vertical-align: -1px;"
-                                class="font-background">正在加载...</el-text>
-                        </div>
-                    </el-tooltip>
-                </div>
-            </transition> 
+  <div class="ios-card glass">
+    <div class="ip-info-container">
+      <transition name="el-fade-in">
+        <div v-if="ipInfo.local" class="ip-row" @click="onQuery(ipInfo.local.ip)">
+          <div class="ip-tag-wrapper">
+            <span class="ios-badge success">{{ ipInfo.layLocal ? ipInfo.layLocal + 'ms' : '-ms' }}</span>
+          </div>
+          <div class="ip-text-content">
+            <span class="ip-address">{{ ipInfo.local.ip }}</span>
+            <span class="ip-details">{{ ipInfo.local.show.join(' ') }}</span>
+          </div>
         </div>
+      </transition>
+
+      <div class="divider" v-if="ipInfo.local && ipInfo.cloudflare"></div>
+
+      <transition name="el-fade-in">
+        <div v-if="ipInfo.cloudflare" class="ip-row" @click="onQuery(ipInfo.cloudflare.ip)">
+          <div class="ip-tag-wrapper">
+            <span class="ios-badge warning">{{ ipInfo.layCloudflare ? ipInfo.layCloudflare + 'ms' : '-ms' }}</span>
+          </div>
+          <div class="ip-text-content">
+            <span class="ip-address">{{ ipInfo.cloudflare.ip }}</span>
+            <span class="ip-details">{{ ipInfo.cloudflare.show.join(' ') }}</span>
+          </div>
+        </div>
+      </transition>
+
+      <div v-if="!ipInfo.local && !ipInfo.cloudflare" class="loading-state">
+        <el-icon class="is-loading"><Loading /></el-icon>
+        <span>正在获取网络信息...</span>
+      </div>
     </div>
-    <el-dialog align-center style="width: 95vw;max-width: 600px;max-height: 85vh;" v-model="queryWindow" title="IP查询">
-        <el-input v-model="ipInput" style="max-width: 600px" placeholder="请输入IPV4/IPV6地址" clearable autocomplete="new-password">
-            <template #append><el-button type="primary" :icon="Search" circle  @click="onQuery(ipInput)"/></template>
+
+    <el-dialog v-model="queryWindow" title="IP 详细信息" width="90%" class="ios-dialog">
+      <div class="query-input-group">
+        <el-input v-model="ipInput" placeholder="输入 IP 地址">
+          <template #append>
+            <el-button :icon="Search" @click="onQuery(ipInput)" />
+          </template>
         </el-input>
-         <table class="ip-table" v-loading="isQuerying">
-            <tr>
-                <td @click="copy(ipRet.ip)">{{ ipRet.ip }}</td>
-            </tr>
-            <tr>
-                <td>{{ ipRet.addr }}</td>
-            </tr>
-            <tr v-if="ipRet.as?.info || ipRet.type">
-                <td>{{ ipRet.as?.info }} {{ ipRet.type }}</td>
-            </tr>
-            <tr v-if="ipRet.as">
-                <td>
-                    ASN {{ ipRet.as?.number }}
-                </td>
-            </tr>
-            <tr v-if="ipRet.country">
-                <td>
-                    {{ ipRet.country?.name }}({{ ipRet.country?.code }}) {{ ipRet.regions?.join(" ") }}
-                </td>
-            </tr>
-            <tr v-if="ipRet.registered_country?.code != ipRet.country?.code">
-                <td>
-                    注册地 {{ ipRet.registered_country?.name }}({{ ipRet.registered_country?.code }})
-                </td>
-            </tr>
-            <tr>
-                <td>{{ ipRet.as?.name }}</td>
-            </tr>
-         </table>
+      </div>
+      
+      <div class="ip-details-list" v-loading="isQuerying">
+        <div class="detail-item" v-if="ipRet.ip" @click="copy(ipRet.ip)">
+          <span class="label">IP 地址</span>
+          <span class="value">{{ ipRet.ip }}</span>
+        </div>
+        <div class="detail-item" v-if="ipRet.addr">
+          <span class="label">网段</span>
+          <span class="value">{{ ipRet.addr }}</span>
+        </div>
+        <div class="detail-item" v-if="ipRet.country">
+          <span class="label">位置</span>
+          <span class="value">{{ ipRet.country.name }} {{ ipRet.regions?.join(' ') }}</span>
+        </div>
+        <div class="detail-item" v-if="ipRet.as">
+          <span class="label">运营商</span>
+          <span class="value">{{ ipRet.as.info || ipRet.as.name }}</span>
+        </div>
+        <div class="detail-item" v-if="ipRet.type">
+          <span class="label">类型</span>
+          <span class="value">{{ ipRet.type }}</span>
+        </div>
+      </div>
     </el-dialog>
+  </div>
 </template>
 
 <script lang="ts" setup>
-const props = defineProps({
-    isVisible: Boolean
-})
-import { reactive,ref, type Ref } from 'vue'
+import { reactive, ref, type Ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { toClipboard } from '@soerenmartius/vue3-clipboard'
-import { Search } from '@element-plus/icons-vue'
+import { Search, Loading } from '@element-plus/icons-vue'
+
+const props = defineProps({ isVisible: Boolean })
+
 const queryWindow = ref(false)
 const isQuerying = ref(false)
 const ipInput = ref("")
 const ipRet: Ref<any> = ref({})
-const onQuery = async(ip:string) => {
-    queryWindow.value = true
-    try {
-        const ipv4 = /^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$/;
-        const ipv6 = /^([\da-fA-F]{1,4}:){6}((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$|^::([\da-fA-F]{1,4}:){0,4}((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$|^([\da-fA-F]{1,4}:):([\da-fA-F]{1,4}:){0,3}((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$|^([\da-fA-F]{1,4}:){2}:([\da-fA-F]{1,4}:){0,2}((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$|^([\da-fA-F]{1,4}:){3}:([\da-fA-F]{1,4}:){0,1}((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$|^([\da-fA-F]{1,4}:){4}:((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$|^([\da-fA-F]{1,4}:){7}[\da-fA-F]{1,4}$|^:((:[\da-fA-F]{1,4}){1,6}|:)$|^[\da-fA-F]{1,4}:((:[\da-fA-F]{1,4}){1,5}|:)$|^([\da-fA-F]{1,4}:){2}((:[\da-fA-F]{1,4}){1,4}|:)$|^([\da-fA-F]{1,4}:){3}((:[\da-fA-F]{1,4}){1,3}|:)$|^([\da-fA-F]{1,4}:){4}((:[\da-fA-F]{1,4}){1,2}|:)$|^([\da-fA-F]{1,4}:){5}:([\da-fA-F]{1,4})?$|^([\da-fA-F]{1,4}:){6}:$/;
-    
-        if (!ipv4.test(ip) && !ipv6.test(ip)) {
-            throw "请输入正确的IP地址"
-        }
-        isQuerying.value = true
-        ipRet.value = await cachedQuery(ip)
-        isQuerying.value = false
-    } catch (error) {
-        ElMessage.error(String(error))
-    }
-}
-const ipInfo: {local:any, cloudflare:any,layLocal:any,layCloudflare:any} = reactive({local:null, cloudflare:null,layLocal:null,layCloudflare:null})
-const copy = (ip: string) => {
-    toClipboard(ip)
-    ElMessage.success({
-        dangerouslyUseHTMLString: true,
-        message: `已经复制IP地址：<br><strong>${ip}</strong>`,
-    })
+const ipInfo: any = reactive({ local: null, cloudflare: null, layLocal: null, layCloudflare: null })
+
+const onQuery = async (ip: string) => {
+  if (!ip) return
+  queryWindow.value = true
+  isQuerying.value = true
+  try {
+    ipRet.value = await cachedQuery(ip)
+  } catch (e) {
+    ElMessage.error('查询失败')
+  } finally {
+    isQuerying.value = false
+  }
 }
 
-async function queryIp(ip: string) {
-    const rsp = await fetch(import.meta.env.VITE_API_URL + "ip.ajax?ip=" + ip, {
-        method: "GET",
-        mode: "cors",
-        redirect: "follow",
-        referrerPolicy: "no-referrer"
-    });
-    let resp = await rsp.json();
-    return resp['data']
+const copy = (text: string) => {
+  toClipboard(text)
+  ElMessage.success('已复制到剪贴板')
 }
 
-let failure = false
 async function cachedQuery(ip: string) {
-    let ret = JSON.parse(localStorage.getItem("cache_ip_"+ip) || "{}")
-    if (!ret.ip || new Date().getTime() / 1000 - ret.time > 60 * 60 * 24){
-        try {
-            if(failure) throw ""
-            ret = await queryIp(ip)
-        } catch (error) {
-            failure = true
-            throw "查询IP信息失败"
-        }
-        ret['time'] = new Date().getTime() / 1000
-        localStorage.setItem("cache_ip_"+ip, JSON.stringify(ret))
-    }
-    return ret
+  const cacheKey = `cache_ip_${ip}`
+  const cached = localStorage.getItem(cacheKey)
+  if (cached) {
+    const data = JSON.parse(cached)
+    if (Date.now() / 1000 - data.time < 86400) return data
+  }
+  
+  const rsp = await fetch(`${import.meta.env.VITE_API_URL}ip.ajax?ip=${ip}`)
+  const res = await rsp.json()
+  const data = { ...res.data, time: Date.now() / 1000 }
+  localStorage.setItem(cacheKey, JSON.stringify(data))
+  return data
 }
 
 async function handleIP(ip: string) {
-    const info = await cachedQuery(ip)
-    info.show = info.regions_short || info.regions || []
-    if (info.country && info.country.code != "CN") {
-        info.show = [info.country.name, ...info.show]
-    }
-    if (info.as) {
-        info.show.push(info.as.info || info.as.name)
-    }
-    if (info.type) {
-        info.show.push(info.type)
-    }
-    return info
+  const info = await cachedQuery(ip)
+  info.show = info.regions_short || info.regions || []
+  if (info.country && info.country.code !== "CN") info.show = [info.country.name, ...info.show]
+  if (info.as) info.show.push(info.as.info || info.as.name)
+  if (info.type) info.show.push(info.type)
+  return info
 }
 
-(async function watchLocalIp() {
-    if (props.isVisible) {
-        try {
-            const response = await fetch(import.meta.env.VITE_API_URL + 'ip.ajax', { referrerPolicy: 'no-referrer' });
-            let resp = await response.json();
-            ipInfo.local = await handleIP(resp["data"]["ip"])
-        } catch (error) {
-            console.log(error)
-        }
-    }
-    setTimeout(watchLocalIp, 60000)
-})();
-
-const watchCloudflare = async(host: string) => {
-    if (props.isVisible) {
-        try {
-            var start_timestamp = new Date().getTime();
-            const response = await fetch(`https://${host}/cdn-cgi/trace`, { referrerPolicy: 'no-referrer' });
-            const lay = new Date().getTime() - start_timestamp;
-            let resp = await response.text();
-            let ip = resp.match(/ip=([0-9a-f.:]+)/);
-            if (ip) {
-                ipInfo.cloudflare = await handleIP(ip[1])
-                ipInfo.layCloudflare = lay
-            }
-        } catch (error) {
-            console.log(error)
-        }
-    }
-    setTimeout(watchCloudflare, 1000, host)
+// Initial Data Fetching
+const fetchLocal = async () => {
+  try {
+    const rsp = await fetch(`${import.meta.env.VITE_API_URL}ip.ajax`)
+    const res = await rsp.json()
+    ipInfo.local = await handleIP(res.data.ip)
+    
+    const start = Date.now()
+    await fetch("https://connectivitycheck.platform.hicloud.com/generate_204", { mode: 'no-cors' })
+    ipInfo.layLocal = Date.now() - start
+  } catch (e) {}
+  setTimeout(fetchLocal, 30000)
 }
 
-watchCloudflare("cp.cloudflare.com")
-// watchCloudflare("chat.openai.com")
+const fetchCF = async () => {
+  try {
+    const start = Date.now()
+    const rsp = await fetch("https://cp.cloudflare.com/cdn-cgi/trace")
+    const text = await rsp.text()
+    ipInfo.layCloudflare = Date.now() - start
+    const ipMatch = text.match(/ip=([0-9a-f.:]+)/)
+    if (ipMatch) ipInfo.cloudflare = await handleIP(ipMatch[1])
+  } catch (e) {}
+  setTimeout(fetchCF, 30000)
+}
 
-;(async function getCNLay() {
-    if (props.isVisible) {
-        try {
-            var start_timestamp = new Date().getTime();
-            await fetch("https://connectivitycheck.platform.hicloud.com/generate_204",
-            { method: "HEAD", cache: "no-store", mode: 'no-cors', referrerPolicy: 'no-referrer' });
-            ipInfo.layLocal = new Date().getTime() - start_timestamp
-        } catch (error) {
-            ipInfo.layLocal = 0
-        }
-    }
-    setTimeout(getCNLay, 1000)
-})();
+fetchLocal()
+fetchCF()
 </script>
 
 <style scoped>
-.font-background {
-    color: var(--text-color);
-    font-size: 14px;
-    font-weight: 500;
+.ios-card {
+  border-radius: var(--radius-ios-lg);
+  padding: 12px 16px;
 }
 
-.card {
-    max-width: 800px;
-    height: fit-content;
-    display: block;
-    margin: 0 auto;
-    padding: 20px;
+.ip-info-container {
+  display: flex;
+  flex-direction: column;
 }
 
-.ip-table {
-    width: 100%;
-    margin: 20px auto;
-    padding: 15px;
-    border-radius: var(--radius-lg);
-    text-align: center;
-    border-collapse: separate;
-    border-spacing: 0 8px;
+.ip-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  overflow: hidden;
 }
 
-.ip-table td {
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.03);
-    border-radius: 8px;
+.ip-row:active {
+  opacity: 0.6;
+}
+
+.ip-tag-wrapper {
+  flex-shrink: 0;
+  width: 60px;
+}
+
+.ios-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 45px;
+  text-align: center;
+}
+
+.ios-badge.success { background: rgba(52, 199, 89, 0.15); color: #248a3d; }
+.ios-badge.warning { background: rgba(255, 149, 0, 0.15); color: #b26a00; }
+
+.ip-text-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.ip-address {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  flex-shrink: 0;
+}
+
+.ip-details {
+  font-size: 14px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(0,0,0,0.05);
+  margin: 0 0 0 60px;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.ip-details-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.detail-item {
+  background: rgba(0,0,0,0.03);
+  padding: 12px 16px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-item .label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.detail-item .value {
+  font-size: 14px;
+  font-weight: 600;
 }
 
 @media (prefers-color-scheme: dark) {
-    .ip-table td {
-        background: rgba(255, 255, 255, 0.05);
-    }
+  .divider { background: rgba(255,255,255,0.1); }
+  .detail-item { background: rgba(255,255,255,0.05); }
+  .ios-badge.success { background: rgba(48, 209, 88, 0.2); color: #30d158; }
+  .ios-badge.warning { background: rgba(255, 159, 10, 0.2); color: #ff9f0a; }
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .ip-text-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  .ip-details {
+    font-size: 12px;
+  }
 }
 </style>
