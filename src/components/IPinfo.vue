@@ -204,37 +204,65 @@ watchCloudflare("cp.cloudflare.com")
 </script>
 
 <style scoped>
-.font-background {
-    color: #344357;
-    font-size: 14px;
+.card {
+  max-width: 800px;
+  height: fit-content;
+  display: block;
+  margin: 0 auto;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--bg-blur));
+  -webkit-backdrop-filter: blur(var(--bg-blur));
+  border: 1px solid var(--glass-stroke);
+  border-radius: var(--radius-lg);
+  padding: 2%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.card {
-    max-width: 800px;
-    height: fit-content;
-    display: block;
-    margin: 0 auto;
-    background-color: #ffffff;
-    padding: 2%
+.font-background {
+  color: var(--text-color);
+  font-size: 14px;
+  opacity: 0.8;
 }
 
 .ip-table {
-    height: 100%;
-    margin: 20px auto;
-    padding: 10px;
-    border: #ffffff 1px solid;
-    border-radius: 10px;
-
-    text-align: center;
+  height: 100%;
+  margin: 20px auto;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-stroke);
+  border-radius: var(--radius-lg);
+  text-align: center;
 }
 
-@media (prefers-color-scheme: dark) {
-    .card {
-        background-color: rgb(18, 18, 18);
-    }
+.ip-table tr td {
+  padding: 12px;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--glass-stroke);
+}
 
-    .font-background {
-        color: rgb(193, 206, 230);
-    }
+.ip-table tr:last-child td {
+  border-bottom: none;
+}
+
+.ip-table tr:hover td {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 15px;
+  }
+
+  .ip-table {
+    margin: 15px auto;
+    padding: 8px;
+  }
+
+  .ip-table tr td {
+    padding: 10px 8px;
+    font-size: 14px;
+  }
 }
 </style>

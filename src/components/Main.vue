@@ -106,9 +106,7 @@
           </svg>
         </a>
       </div>
-      <el-button style="float: left;margin-top: -20px;margin-right: 3px" type="primary" :icon="Histogram" link
-        @click="showMark.show = true" />
-        <el-button style="float: left;margin-top: -20px;margin-left: 39px" type="primary" :icon="FullScreen" link
+      <el-button style="float: left;margin-top: -20px;margin-left: 39px" type="primary" :icon="FullScreen" link
         @click="isFullScreen = true" />
       <el-button style="float: right;margin-top: -20px;margin-right: 3px" type="primary" :icon="TrendCharts" link
         v-if="!chartShow" @click="chartShow = true" />
@@ -224,7 +222,6 @@
       </span>
     </template>
   </el-dialog>
-  <MarkUI :show="showMark" :loginInfo="loginInfo" />
   <audio v-if="isMobile && !isIOS && !isMiuiBrowser && runBackground" @canplay="() => { if (isRunning) audioDom.play() }"
     @pause="() => { if (runBackground) isRunning = false }" @play="isRunning = true" controls loop ref="audioDom"
     style="display:none">
@@ -247,13 +244,10 @@ const props = defineProps({
 })
 import { ElMessage } from 'element-plus'
 import nodesJson from "../assets/nodes.json"
-import { Link, Edit, Delete, CircleCheck, Loading, CopyDocument, TrendCharts, Hide, Histogram, Calendar,FullScreen } from '@element-plus/icons-vue'
+import { Link, Edit, Delete, CircleCheck, Loading, CopyDocument, TrendCharts, Hide, Calendar,FullScreen } from '@element-plus/icons-vue'
 import { ref, watch,watchEffect, type Ref, reactive } from 'vue'
 import { toClipboard } from '@soerenmartius/vue3-clipboard'
-import MarkUI from './Mark.vue'
 import FullScreenUI from './FullScreen.vue'
-
-const showMark = ref({ show: false })
 const customNodes = reactive(localStorage.customNodes ? JSON.parse(localStorage.customNodes) : [])
 const OnlineNodes: {
   label: string;
@@ -855,25 +849,25 @@ onUnmounted(() => {
 });
 </script>
 <style scoped>
+.card {
+  max-width: 800px;
+  height: fit-content;
+  display: block;
+  margin: 0 auto;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--bg-blur));
+  -webkit-backdrop-filter: blur(var(--bg-blur));
+  border: 1px solid var(--glass-stroke);
+  border-radius: var(--radius-lg);
+  padding: 2%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
 .ItemContainer {
   column-count: 3;
   margin-top: 10px;
 }
 
-.card{
-  max-width: 800px;
-  height:fit-content;
-  display: block;
-  margin:0 auto;
-  background-color:#ffffff;
-  padding:2%
-}
-
-@media (prefers-color-scheme: dark) {
-    .card {
-        background-color:rgb(18,18,18);
-    }
-}
 @media screen and (max-width: 800px) {
   .ItemContainer {
     column-count: 1;
@@ -881,8 +875,18 @@ onUnmounted(() => {
 }
 
 .showItem {
-  border: 1px solid #dbdfea !important;
-  padding: 20px 15px 15px 30px
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-stroke) !important;
+  padding: 20px 15px 15px 30px;
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+}
+
+.showItem:hover {
+  background: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
 }
 
 .font-data {
@@ -891,11 +895,13 @@ onUnmounted(() => {
   font-weight: 700;
   line-height: 2.5rem;
   font-size: 30px;
+  color: var(--text-color);
 }
 
-.font-background{
-  color: #344357;
+.font-background {
+  color: var(--text-color);
   font-size: 14px;
+  opacity: 0.8;
 }
 
 .state-icon {
@@ -905,60 +911,77 @@ onUnmounted(() => {
   margin-top: -10px;
   width: 40px;
   height: 20px;
-  color: rgb(96,98,102);
+  color: var(--text-color);
+  opacity: 0.7;
 }
 
-.state-icon-main{
-  color: rgb(9,194,222);
+.state-icon-main {
+  color: var(--primary);
 }
 
-.svg-icon{
-  fill:rgb(255,255,255);
+.svg-icon {
+  fill: white;
   width: 50px;
   margin-left: 10px;
   margin-top: -30px;
 }
 
-.el-select-dropdown__wrap{
+.el-select-dropdown__wrap {
   max-height: 60vh;
 }
-.el-icon-loading{
+
+.el-icon-loading {
   margin-top: 40px;
-  color:rgb(255,255,255);
+  color: var(--primary);
 }
-@media (prefers-color-scheme: dark) {
-    .showItem {
-      border: 1px solid rgb(61,63,66) !important;
-    }
-    .state-icon{
-      color: rgb(165,167,172);
-    }
-    .state-icon-main{
-      color: rgb(30,105,131);
-    }
-    .font-background{
-        color: rgb(193,206,230);
-    }
-    .svg-icon{
-      fill:rgb(220,220,220);
-    }
-}
-
-
 
 .button {
   display: block;
   text-decoration: none;
-  background-color: #485bed;
-  background-image: -webkit-linear-gradient(145deg, #485bed, #6576ff);
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   font-size: 30px;
   font-weight: 700 !important;
-  margin: 36px;
+  margin: 36px auto;
   width: 144px;
   height: 144px;
   position: relative;
   text-align: center;
   line-height: 144px;
   border-radius: 50%;
-  box-shadow: 0px 3px 8px #485bed, inset 0px 2px 3px #6576ff;
-}</style>
+  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.4), inset 0 2px 3px rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(0, 122, 255, 0.5), inset 0 2px 3px rgba(255, 255, 255, 0.3);
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 15px;
+  }
+
+  .font-data {
+    font-size: 24px;
+    line-height: 2rem;
+  }
+
+  .button {
+    width: 120px;
+    height: 120px;
+    line-height: 120px;
+    margin: 20px auto;
+    font-size: 24px;
+  }
+
+  .showItem {
+    padding: 15px 10px 10px 20px;
+  }
+}
+</style>

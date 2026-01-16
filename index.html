@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <link rel="icon" href="./icon.png">
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-    <title>网络面板 - 实时监测您的网络情况</title>
+    <title>ChuiYan SpeedTest</title>
     <meta name="keywords" content="网络面板,网络面板官网,网络测速,网速测试,ljxnet,Whoami,flowloss,流量消耗器,流量消耗,定向流量消耗">
     <meta name="description" content="网络面板(NetworkPanel)是一个在线流量消耗器，可以测试您的网速，监测您的网络环境，提供丰富测试节点，并且长期维护更新">
     <meta name="author" content="Whoami">
@@ -22,22 +22,94 @@
     <meta name="baidu_union_verify" content="844e54539687a7613d24c288e42328a4">
     <link rel="manifest" href="./manifest.webmanifest">
     <style>
-        body{
-            background-color: #ffffff;
-            margin: 0;
-            font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+        :root {
+            --bg-blur: 20px;
+            --glass-bg: rgba(255, 255, 255, 0.4);
+            --glass-stroke: rgba(255, 255, 255, 0.5);
+            --text-color: #1f2937;
+            --primary: #007aff;
+            --primary-light: #5ac8fa;
+            --page-bg: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            --radius-lg: 20px;
+            --radius-xl: 30px;
+            --container-max-width: 1000px;
         }
-        #app{
-            background-color: aliceblue;
-            min-height: 100vh;
-        }
+
         @media (prefers-color-scheme: dark) {
-            body {
-                background-color: rgb(18, 18, 18);
+            :root {
+                --page-bg: radial-gradient(circle at 10% 20%, #1e3a5f 0%, #0b1220 50%, #0a0d14 100%), linear-gradient(180deg, #0b1220, #0a0d14);
+                --glass-bg: rgba(20, 24, 28, 0.5);
+                --glass-stroke: rgba(255, 255, 255, 0.15);
+                --primary: #0a84ff;
+                --primary-light: #64d2ff;
+                --text-color: #e5e7eb;
             }
-            #app{
-                background-color: rgb(33,34,37);
-            }
+        }
+
+        body {
+            margin: 0;
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: var(--page-bg);
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        #app {
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--bg-blur));
+            -webkit-backdrop-filter: blur(var(--bg-blur));
+            border: 1px solid var(--glass-stroke);
+            border-radius: var(--radius-lg);
+        }
+
+        .btn-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--bg-blur));
+            -webkit-backdrop-filter: blur(var(--bg-blur));
+            border: 1px solid var(--glass-stroke);
+            border-radius: var(--radius-lg);
+            color: var(--text-color);
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-glass:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-glass:active {
+            transform: scale(0.98);
+        }
+
+        .input-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--bg-blur));
+            -webkit-backdrop-filter: blur(var(--bg-blur));
+            border: 1px solid var(--glass-stroke);
+            border-radius: var(--radius-lg);
+            color: var(--text-color);
+            padding: 10px 15px;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-glass:focus {
+            border-color: var(--primary);
+        }
+
+        .input-glass::placeholder {
+            color: var(--text-color);
+            opacity: 0.6;
         }
         ::-webkit-scrollbar {
             display: none; /* Chrome Safari */
