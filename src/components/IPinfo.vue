@@ -280,25 +280,22 @@ onUnmounted(() => {
   gap: 12px;
   margin-top: 20px;
 }
-</style>
 
-<style>
-.el-loading-mask {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(8px) saturate(180%);
-  -webkit-backdrop-filter: blur(8px) saturate(180%);
+:deep(.el-loading-mask) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border-radius: 18px;
-  transition: all 0.3s;
 }
 
 @media (prefers-color-scheme: dark) {
-  .el-loading-mask {
-    background-color: rgba(28, 28, 30, 0.5) !important;
+  :deep(.el-loading-mask) {
+    background-color: rgba(0, 0, 0, 0.4) !important;
   }
 }
 
-.el-loading-spinner .path {
-  stroke: #007aff !important;
+:deep(.el-loading-spinner .path) {
+  stroke: var(--ios-blue) !important;
 }
 
 .detail-item {
