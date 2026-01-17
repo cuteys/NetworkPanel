@@ -151,15 +151,21 @@
     </div>
 
     <el-dialog v-model="EditTableVisible" title="自定义地址" class="ios-dialog-custom" append-to-body>
-      <el-table v-if="customNodes.length" :data="customNodes" style="width: 100%" max-height="300">
-        <el-table-column prop="label" label="名称" width="100" />
-        <el-table-column prop="value" label="URL" />
-        <el-table-column fixed="right" label="" width="50">
-          <template #default="scope">
-            <el-button type="danger" link @click.prevent="customNodes.splice(scope.$index, 1)" />
-          </template>
-        </el-table-column>
-      </el-table>
+      <div class="ios-list-container" v-if="customNodes.length">
+        <div v-for="(item, index) in customNodes" :key="index" class="ios-list-item">
+          <div class="item-info">
+            <div class="item-label">{{ item.label }}</div>
+            <div class="item-value">{{ item.value }}</div>
+          </div>
+          <button class="delete-btn" @click.prevent="customNodes.splice(index, 1)" title="删除">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
       <el-empty v-else description="没有自定义地址" />
       <el-button class="mt-4 ios-btn-full" type="primary" @click="addTableVisible = true;">添加地址</el-button>
     </el-dialog>
@@ -181,11 +187,19 @@
       </el-form>
       <div class="alert-container">
         <el-alert title="注意" type="warning" :closable="false" show-icon>
-          在浏览器工作的程序受到浏览器安全策略的限制。
+          在浏览器工作的程序受到浏览器安全策略的限制
+          <br>
+          以下情况你将无法正常使用链接
+          <br>
+          1.你使用https协议打开的本站，但是url是http协议
+          <br>
+          2.目标服务器返回的Access-Control-Allow-Origin响应头没有允许本站
+          <br>
+          具体细节请在报错后查看控制台
         </el-alert>
         <div class="alert-spacer"></div>
         <el-alert title="免责声明" type="error" :closable="false" show-icon>
-          请勿用于非法用途，使用本功能造成的一切后果由用户承担。
+          请勿用于非法用途，使用本功能造成的一切后果由用户承担
         </el-alert>
       </div>
       <template #footer>
@@ -538,7 +552,11 @@ const addNode = async () => {
   const urlStatus = await checkUrl(addForm.value.value)
   addForm.value.checking = false
   if (!urlStatus.status) {
-    ElMessage.error({ dangerouslyUseHTMLString: true, message: urlStatus.info })
+    let friendlyMsg = '无法连接到该地址，请检查链接'
+    if (urlStatus.info.includes('你不对劲')) friendlyMsg = '该域名在黑名单中，无法添加'
+    if (urlStatus.info.includes('404')) friendlyMsg = '资源不存在，请检查路径'
+    if (urlStatus.info.includes('abort')) friendlyMsg = '连接超时，请稍后重试'
+    ElMessage.error(friendlyMsg)
     return
   }
   customNodes.push({ label: addForm.value.label, value: addForm.value.value })
@@ -583,6 +601,7 @@ onMounted(() => {
         saveAsImage: {
           show: true,
           title: '下载',
+          backgroundColor: isDark ? '#1c1c1e' : '#ffffff',
           iconStyle: { 
             borderColor: isDark ? '#ffffff' : '#1c1c1e',
             borderWidth: 1.5
@@ -1000,15 +1019,91 @@ onUnmounted(() => { if (myChart) myChart.dispose(); });
     gap: 16px;
   }
 }
-</style>
 
-<style scoped>
 .input-with-select {
   display: flex;
   gap: 10px;
   align-items: center;
 }
+
 .input-with-select .el-input {
   flex: 1;
+}
+
+.ios-list-container {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ios-list-container {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.ios-list-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  gap: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: background 0.2s;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ios-list-item {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.ios-list-item:last-child {
+  border-bottom: none;
+}
+
+.item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+
+.item-value {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.delete-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.delete-btn:active {
+  transform: scale(0.9);
+  background: rgba(255, 59, 48, 0.2);
+}
+
+.delete-btn svg {
+  width: 16px;
+  height: 16px;
 }
 </style>

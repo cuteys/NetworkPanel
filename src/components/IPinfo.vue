@@ -194,7 +194,8 @@ onUnmounted(() => {
 
 .ip-tag-wrapper {
   flex-shrink: 0;
-  width: 65px;
+  width: 75px;
+  margin-right: 5px;
 }
 
 .ios-badge {
@@ -278,6 +279,26 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 12px;
   margin-top: 20px;
+}
+</style>
+
+<style>
+.el-loading-mask {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(8px) saturate(180%);
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
+  border-radius: 18px;
+  transition: all 0.3s;
+}
+
+@media (prefers-color-scheme: dark) {
+  .el-loading-mask {
+    background-color: rgba(28, 28, 30, 0.5) !important;
+  }
+}
+
+.el-loading-spinner .path {
+  stroke: #007aff !important;
 }
 
 .detail-item {
