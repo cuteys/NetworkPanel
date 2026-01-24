@@ -2,7 +2,7 @@
   <div class="ios-card glass">
     <div class="ip-info-container">
       <transition name="el-fade-in">
-        <div v-if="ipInfo.local" class="ip-row" @click="onQuery(ipInfo.local.ip)">
+        <div v-if="ipInfo.local && ipInfo.local.country && ipInfo.local.country.code == 'CN'" class="ip-row" @click="onQuery(ipInfo.local.ip)">
           <div class="ip-tag-wrapper">
             <span class="ios-badge success">{{ ipInfo.layLocal ? ipInfo.layLocal + 'ms' : '-ms' }}</span>
           </div>
@@ -13,10 +13,10 @@
         </div>
       </transition>
 
-      <div class="divider" v-if="ipInfo.local && ipInfo.cloudflare"></div>
+      <div class="divider" v-if="ipInfo.local && ipInfo.local.country && ipInfo.local.country.code == 'CN' && ipInfo.cloudflare && ipInfo.cloudflare.country && ipInfo.cloudflare.country.code != 'CN'"></div>
 
       <transition name="el-fade-in">
-        <div v-if="ipInfo.cloudflare" class="ip-row" @click="onQuery(ipInfo.cloudflare.ip)">
+        <div v-if="ipInfo.cloudflare && ipInfo.cloudflare.country && ipInfo.cloudflare.country.code != 'CN'" class="ip-row" @click="onQuery(ipInfo.cloudflare.ip)">
           <div class="ip-tag-wrapper">
             <span class="ios-badge warning">{{ ipInfo.layCloudflare ? ipInfo.layCloudflare + 'ms' : '-ms' }}</span>
           </div>
@@ -27,7 +27,7 @@
         </div>
       </transition>
 
-      <div v-if="!ipInfo.local && !ipInfo.cloudflare" class="loading-state">
+      <div v-if="(!ipInfo.local || (ipInfo.local.country && ipInfo.local.country.code != 'CN')) && (!ipInfo.cloudflare || (ipInfo.cloudflare.country && ipInfo.cloudflare.country.code == 'CN'))" class="loading-state">
         <el-icon class="is-loading"><Loading /></el-icon>
         <span>正在获取网络信息...</span>
       </div>
@@ -128,17 +128,21 @@ let cfTimer: any = null
 
 const fetchLocal = async () => {
   try {
-    if (!ipInfo.local) {
-      const rsp = await fetch(`${import.meta.env.VITE_API_URL}ip.ajax`)
-      const res = await rsp.json()
-      ipInfo.local = await handleIP(res.data.ip)
+    const rsp = await fetch(`${import.meta.env.VITE_API_URL}ip.ajax`, { cache: 'no-store' })
+    const res = await rsp.json()
+    const newInfo = await handleIP(res.data.ip)
+    // 如果 IP 发生变化或之前为空，则更新
+    if (!ipInfo.local || ipInfo.local.ip !== newInfo.ip) {
+      ipInfo.local = newInfo
     }
     
     const start = Date.now()
     await fetch("https://connectivitycheck.platform.hicloud.com/generate_204", { mode: 'no-cors', cache: 'no-store' })
     ipInfo.layLocal = Date.now() - start
-  } catch (e) {}
-  localTimer = setTimeout(fetchLocal, 1000)
+  } catch (e) {
+    ipInfo.layLocal = 0
+  }
+  localTimer = setTimeout(fetchLocal, 5000) // 降低频率，避免请求过快
 }
 
 const fetchCF = async () => {
@@ -147,14 +151,22 @@ const fetchCF = async () => {
     await fetch("https://cp.cloudflare.com/generate_204", { mode: 'no-cors', cache: 'no-store' })
     ipInfo.layCloudflare = Date.now() - start
     
-    if (!ipInfo.cloudflare) {
-      const rsp = await fetch("https://cp.cloudflare.com/cdn-cgi/trace")
-      const text = await rsp.text()
-      const ipMatch = text.match(/ip=([0-9a-f.:]+)/)
-      if (ipMatch) ipInfo.cloudflare = await handleIP(ipMatch[1])
+    const rsp = await fetch("https://cp.cloudflare.com/cdn-cgi/trace", { cache: 'no-store' })
+    const text = await rsp.text()
+    const ipMatch = text.match(/ip=([0-9a-f.:]+)/)
+    if (ipMatch) {
+      const newInfo = await handleIP(ipMatch[1])
+      // 核心逻辑：如果当前 CF 探测到的 IP 变成了国内 IP，则清空 cloudflare 数据，使其在界面隐藏
+      if (newInfo.country && newInfo.country.code === 'CN') {
+        ipInfo.cloudflare = null
+      } else if (!ipInfo.cloudflare || ipInfo.cloudflare.ip !== newInfo.ip) {
+        ipInfo.cloudflare = newInfo
+      }
     }
-  } catch (e) {}
-  cfTimer = setTimeout(fetchCF, 1000)
+  } catch (e) {
+    ipInfo.layCloudflare = 0
+  }
+  cfTimer = setTimeout(fetchCF, 3000)
 }
 
 onMounted(() => {
